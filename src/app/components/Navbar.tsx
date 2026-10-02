@@ -1,14 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { useCartCount } from '../hooks/useCartCount';
 import { NAV_LINKS } from '../lib/constants';
 import Image from 'next/image';
+import { FiUser } from 'react-icons/fi';
+import { useWishlistCount } from '../hooks/useWishlistCount';
 
 export default function Navbar() {
+  const pathname = usePathname();
+   const cartCount = useCartCount();
+  const wishlistCount = useWishlistCount();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-
+ 
   return (
     <header className="sticky top-0 z-50 bg-white text-[#111111] shadow-md w-full overflow-x-hidden">
       {/* Top Announcement Bar */}
@@ -70,7 +77,11 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-semibold text-[#111111] hover:text-[#F28C28] transition-colors tracking-wide py-2"
+              className={`text-sm font-semibold transition-colors tracking-wide py-2 ${
+                pathname === link.href
+                  ? 'text-[#F28C28]'
+                  : 'text-[#111111] hover:text-[#F28C28]'
+              }`}
             >
               {link.label}
             </Link>
@@ -121,9 +132,10 @@ export default function Navbar() {
               />
             </svg>
 
-            <span className="absolute top-1 right-1 bg-[#F28C28] text-[#111111] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-              0
-            </span>
+          
+         <span className="absolute top-1 right-1 bg-[#F28C28] text-[#111111] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+         {wishlistCount}
+         </span>
           </Link>
 
           {/* Cart Link */}
@@ -146,9 +158,9 @@ export default function Navbar() {
               />
             </svg>
 
-            <span className="absolute top-1 right-1 bg-[#F28C28] text-[#111111] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-              0
-            </span>
+          <span className="absolute top-1 right-1 bg-[#F28C28] text-[#111111] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+             {cartCount}
+             </span>
           </Link>
 
           {/* Account/Login Link */}
@@ -157,19 +169,7 @@ export default function Navbar() {
             className="hidden sm:flex p-2 text-[#123B5D] hover:text-[#F28C28] hover:bg-[#EEF3F6] rounded-full transition-colors focus:outline-none min-w-[38px] min-h-[38px] items-center justify-center"
             aria-label="Account Login"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
+           <FiUser className="w-5 h-5" />
           </Link>
 
           {/* CTA Button */}
@@ -244,12 +244,17 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className="block text-base font-semibold text-[#EEF3F6] hover:text-[#F28C28] py-2 px-3 rounded hover:bg-[#123B5D]/30 transition-colors"
+                className={`block text-base font-semibold py-2 px-3 rounded transition-colors ${
+                  pathname === link.href
+                    ? 'text-[#F28C28] bg-[#123B5D]/30'
+                    : 'text-[#EEF3F6] hover:text-[#F28C28] hover:bg-[#123B5D]/30'
+                }`}
               >
                 {link.label}
               </Link>
             ))}
 
+            {/* Mobile Account */}
             <Link
               href="/account"
               onClick={() => setIsMenuOpen(false)}
@@ -265,7 +270,7 @@ export default function Navbar() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7-7 7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
 
