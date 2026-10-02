@@ -178,8 +178,8 @@ export const SOCIAL_LINKS: SocialLink[] = [
 ];
 
 export const CONTACT_INFO = {
-  phoneDisplay: '+250 788 000 000',
-  phoneHref: 'tel:+250788000000',
+  phoneDisplay: '+250781070569',
+  phoneHref: 'tel:+250781070569',
   emailDisplay: 'nagarmentss@gmail.com',
   emailHref: 'mailto:nagarmentss@gmail.com',
   locationDisplay: 'Batsinda Bus Park, Batsinda-Kagugu, Kigali, Rwanda',

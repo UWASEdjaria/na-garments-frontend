@@ -28,7 +28,6 @@ export interface ProductCard {
   price: number;
   currency: string;
   categoryName: string;
-  isCustomizable: boolean;
   imageUrl: string;
   tag?: string;
 }
@@ -49,7 +48,6 @@ export interface FeaturePillar {
   id: string;
   title: string;
   description: string;
-  iconType: 'craft' | 'fit' | 'fabric' | 'bulk';
 }
 export interface FooterLink {
   label: string;
@@ -57,7 +55,60 @@ export interface FooterLink {
 }
 
 export interface SocialLink {
-  name: string;
+  platform: string;
   href: string;
-  platform: 'facebook' | 'instagram' | 'tiktok' | 'whatsapp';
+  ariaLabel: string;
+}
+// Backend Domain API Types
+export type StockStatus = 'low' | 'medium' | 'overstock';
+
+export interface ProductImage {
+  id: string;
+  url: string;
+  isPrimary: boolean;
+  productId: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  stockQuantity: number;
+  minimumStockLevel: number;
+  isAvailable: boolean;
+  stockStatus?: StockStatus;
+  categoryId: string;
+  category?: Category;
+  images: ProductImage[];
+  sizes: string[];
+  colors: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+export interface CartItem {
+  id: string;
+  cartId?: string;
+  productId: string;
+  product: Product;
+  quantity: number;
+  size?: string | null;
+  color?: string | null;
+}
+export interface ProductQueryParams {
+  name?: string;
+  categoryId?: string;
+  slug?: string;
+  page?: number;
+  limit?: number;
 }
