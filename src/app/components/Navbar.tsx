@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useCartCount } from '../hooks/useCartCount';
 import { NAV_LINKS } from '../lib/constants';
@@ -11,11 +11,24 @@ import { useWishlistCount } from '../hooks/useWishlistCount';
 
 export default function Navbar() {
   const pathname = usePathname();
-   const cartCount = useCartCount();
+  const router = useRouter();
+  const cartCount = useCartCount();
   const wishlistCount = useWishlistCount();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
- 
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  const query = searchQuery.trim();
+
+  if (!query) return;
+
+  router.push(`/shop?search=${encodeURIComponent(query)}`);
+  setIsSearchOpen(false);
+};
+
   return (
     <header className="sticky top-0 z-50 bg-white text-[#111111] shadow-md w-full overflow-x-hidden">
       {/* Top Announcement Bar */}
@@ -26,10 +39,10 @@ export default function Navbar() {
 
         <div className="hidden sm:flex items-center gap-4 text-xs shrink-0">
           <a
-            href="tel:+250788000000"
+            href="tel:+250781070569"
             className="hover:text-[#F28C28] transition-colors"
           >
-            +250 788 000 000
+            +250781070569
           </a>
 
           <span>|</span>
@@ -44,31 +57,21 @@ export default function Navbar() {
       </div>
 
       {/* Main Navigation Header */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8  min-h-20 sm:min-h-24 py-2 flex items-center justify-between gap-3 sm:gap-6">
         {/* Brand Logo */}
         <Link
-          href="/"
-          className="flex items-center gap-2 shrink-0 group focus:outline-none"
+        href="/"
+        className="flex items-center shrink-0 group focus:outline-none"
         >
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-md bg-[#123B5D] flex items-center justify-center overflow-hidden">
-            <Image
-              src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790879861/75affa54-fc00-4a9c-b196-ac0892d8f8d6.png"
-              alt="NA-GARMENTS"
-              width={50}
-              height={50}
-              className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <span className="font-extrabold text-base sm:text-xl tracking-wider text-[#123B5D] uppercase leading-none group-hover:text-[#F28C28] transition-colors">
-              NA-GARMENTS
-            </span>
-
-            <span className="text-[9px] sm:text-[10px] text-[#111111]/70 font-medium tracking-widest uppercase mt-0.5">
-              Apparel & Tailoring
-            </span>
-          </div>
+        <div className="relative w-44 h-14 sm:w-60 sm:h-18 lg:h-20 flex items-center justify-center overflow-hidden">
+          <Image
+           src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790878768/For_a_white_background.png"
+            alt="NA-GARMENTS"
+            width={361}
+            height={193}
+            className="w-full h-full object-contain"
+          />
+         </div>
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -216,10 +219,15 @@ export default function Navbar() {
       {/* Search Input Bar */}
       {isSearchOpen && (
         <div className="bg-[#111111] border-t border-[#123B5D] px-3 sm:px-6 py-3 transition-all">
-          <div className="max-w-3xl mx-auto flex items-center gap-2">
+          <form
+            onSubmit={handleSearch}
+            className="max-w-3xl mx-auto flex items-center gap-2"
+            >
             <input
               type="text"
               placeholder="Search garments, uniforms, or bespoke suits..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-[#123B5D]/40 border border-[#123B5D] text-white placeholder-gray-400 text-sm rounded px-3 py-2 focus:outline-none focus:border-[#F28C28]"
               autoFocus
             />
@@ -231,8 +239,8 @@ export default function Navbar() {
             >
               Close
             </button>
+            </form>
           </div>
-        </div>
       )}
 
       {/* Mobile Drawer Menu */}
@@ -289,10 +297,10 @@ export default function Navbar() {
 
             <div className="text-center pt-2">
               <a
-                href="tel:+250788000000"
+                href="tel:+250781070569"
                 className="text-xs text-[#EEF3F6]/80 hover:text-[#F28C28] block"
               >
-                Need help? Call: +250 788 000 000
+                Need help? Call: +250781070569
               </a>
             </div>
           </div>

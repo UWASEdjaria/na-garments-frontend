@@ -1,14 +1,12 @@
+
 import Image from 'next/image';
 import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
-import {
-  CONTACT_INFO,
-  FEATURED_CATEGORIES,
-  MOCK_FEATURED_PRODUCTS,
-  TAILORING_STEPS,
-  WHY_CHOOSE_US,
-} from './lib/constants';
+import { CONTACT_INFO, TAILORING_STEPS, WHY_CHOOSE_US } from './lib/constants';
+import FeaturedProducts from './components/FeaturedProducts';
+import FeaturedCategories from './components/FeaturedCategories';
+
 
 export default function HomePage() {
   return (
@@ -21,7 +19,7 @@ export default function HomePage() {
           {/* Full-width Cloudinary Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790939257/amani-nation-8DfNjimFmu0-unsplash.jpg"
+              src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1791035645/maiye-jeremiah-yIWFOg5yidA-unsplash.jpg"
               alt="NA-GARMENTS Bespoke Fitting & Tailoring"
               fill
               priority
@@ -42,17 +40,16 @@ export default function HomePage() {
               </span>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight break-words">
-                Crafted for Quality.
+                Custom Tailoring & Quality Apparel in Kigali
                 <br className="hidden sm:inline" />{' '}
                 <span className="text-[#F28C28]">
-                  Tailored for Perfection.
+                  Made to Fit Your Needs.
                 </span>
               </h1>
 
               <p className="text-sm sm:text-base lg:text-lg text-[#EEF3F6]/90 max-w-2xl mx-auto sm:mx-0 leading-relaxed break-words">
-                NA-GARMENTS delivers ready-to-wear clothing, institutional
-                uniforms, and custom bespoke tailoring crafted with master
-                precision in Kigali, Rwanda.
+                We make practical, well-fitted clothing for schools, workplaces, businesses, and everyday wear, with options for both
+                ready-made and made-to-measure orders in Kigali.
               </p>
 
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-3 sm:gap-4">
@@ -75,16 +72,16 @@ export default function HomePage() {
               <div className="pt-6 grid grid-cols-1 min-[400px]:grid-cols-3 gap-4 min-[400px]:gap-2 border-t border-white/20 text-center max-w-md mx-auto sm:mx-0 text-xs text-[#EEF3F6]/80">
                 <div>
                   <span className="block font-bold text-white text-sm">
-                    100% Custom
+                     Custom orders
                   </span>
-                  Precision Fit
+                  Made to Fit
                 </div>
 
                 <div>
                   <span className="block font-bold text-white text-sm">
-                    Industrial
+                    Quality Fabrics
                   </span>
-                  Grade Fabrics
+                  Selected with care
                 </div>
 
                 <div>
@@ -106,56 +103,14 @@ export default function HomePage() {
             </span>
 
             <h2 className="text-2xl sm:text-4xl font-extrabold text-[#123B5D] tracking-tight break-words">
-              Featured Collections
+              Shop by Clothing Type
             </h2>
 
             <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-              Explore specialized lines designed for institutional performance,
-              industrial safety, and executive elegance.
+              Browse clothing for school, work, business, and everyday use, all in one place.
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 min-w-0">
-            {FEATURED_CATEGORIES.map((category) => (
-              <div
-                key={category.id}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col group min-w-0"
-              >
-                <div className="relative h-48 sm:h-52 w-full bg-gray-100 overflow-hidden">
-                  <Image
-                    src={category.imageUrl}
-                    alt={category.name}
-                    fill
-                    sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-
-                  <span className="absolute bottom-3 left-3 bg-[#111111]/80 text-[#EEF3F6] text-[11px] font-semibold px-2.5 py-1 rounded backdrop-blur">
-                    {category.itemCountText}
-                  </span>
-                </div>
-
-                <div className="p-4 sm:p-6 flex-grow flex flex-col justify-between space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-[#123B5D] mb-2 group-hover:text-[#F28C28] transition-colors break-words">
-                      {category.name}
-                    </h3>
-
-                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                      {category.description}
-                    </p>
-                  </div>
-
-                  <Link
-                    href={`/shop?category=${category.slug}`}
-                    className="w-full bg-[#EEF3F6] text-[#123B5D] group-hover:bg-[#123B5D] group-hover:text-white font-bold text-xs uppercase tracking-wider py-2.5 rounded text-center transition-colors block"
-                  >
-                    View Collection
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+        <FeaturedCategories />
         </section>
 
         {/* 3. Featured Products */}
@@ -167,7 +122,7 @@ export default function HomePage() {
               </span>
 
               <h2 className="text-2xl sm:text-4xl font-extrabold text-[#123B5D] tracking-tight break-words">
-                Featured Products
+                Browse Popular Garments
               </h2>
             </div>
 
@@ -179,65 +134,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {MOCK_FEATURED_PRODUCTS.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col min-w-0"
-              >
-                <div className="relative h-52 sm:h-48 w-full bg-gray-100">
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
-                    className="object-cover"
-                  />
-
-                  {product.tag && (
-                    <span className="absolute top-2 left-2 bg-[#F28C28] text-[#111111] text-[10px] font-extrabold uppercase px-2 py-0.5 rounded">
-                      {product.tag}
-                    </span>
-                  )}
-                </div>
-
-                <div className="p-4 flex-grow flex flex-col justify-between space-y-3">
-                  <div>
-                    <span className="text-[11px] font-semibold text-[#123B5D] uppercase tracking-wide">
-                      {product.categoryName}
-                    </span>
-
-                    <h3 className="font-bold text-sm text-[#111111] mt-1 line-clamp-1 break-words">
-                      {product.name}
-                    </h3>
-
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                      {product.description}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <span className="text-xs text-gray-400 block">
-                        Price
-                      </span>
-
-                      <span className="font-extrabold text-sm text-[#123B5D] break-words">
-                        {product.price.toLocaleString()} {product.currency}
-                      </span>
-                    </div>
-
-                    <Link
-                      href={`/shop/${product.id}`}
-                      className="bg-[#123B5D] text-white hover:bg-[#F28C28] hover:text-[#111111] text-xs font-bold px-3 py-1.5 rounded transition-colors shrink-0"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <FeaturedProducts />
         </section>
 
         {/* 4. Custom Tailoring CTA Section */}
@@ -245,16 +142,15 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12 lg:mb-16">
               <span className="text-xs font-bold text-[#F28C28] uppercase tracking-widest block mb-2">
-                Bespoke Order Process
+                From Choice to Fitting
               </span>
 
               <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight break-words">
-                How Custom Tailoring Works
+                How a Custom Order Works
               </h2>
 
               <p className="text-sm sm:text-base text-[#EEF3F6]/80 mt-3 leading-relaxed">
-                Experience tailored perfection with our structured four-step
-                bespoke crafting workflow.
+                From choosing your style to the final fitting, we guide you through a simple four-step process.
               </p>
             </div>
 
@@ -300,12 +196,11 @@ export default function HomePage() {
             </span>
 
             <h2 className="text-2xl sm:text-4xl font-extrabold text-[#123B5D] break-words">
-              Why Choose NA-GARMENTS
+              What You Can Expect From Us
             </h2>
 
             <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-              Built on local craftsmanship, exact precision, and industrial
-              reliability.
+              We focus on good fit, careful finishing, dependable service, and clothing made for real needs.
             </p>
           </div>
 
@@ -340,21 +235,17 @@ export default function HomePage() {
               </span>
 
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#123B5D] break-words">
-                Rwanda’s Premier Apparel & Custom Tailoring Studio
+                Clothing Made in Kigali, Serving Beyond Rwanda
               </h2>
 
               <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                Based in Kigali, NA-GARMENTS bridges modern apparel
-                manufacturing technology with authentic master tailoring. We
-                produce high-durability school uniforms, industrial protective
-                wear, and bespoke menswear designed to fit perfectly and
-                withstand heavy daily usage.
+                NA-GARMENTS is based in Kagugu, Batsinda, near Batsinda Bus Park in Kigali. We make school uniforms, workwear, men’s clothing, ready-to-wear pieces, and clothing made 
+                to order for individuals, schools, and businesses.
               </p>
 
               <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                Our atelier works directly with educational institutions,
-                enterprise clients, and individual clients requiring bespoke
-                formal garments.
+               Whether you need a few pieces or clothing for a team, we serve customers across Rwanda and beyond, helping individuals, schools,
+               and businesses meet their clothing needs.
               </p>
 
               <div className="pt-2">
@@ -369,12 +260,11 @@ export default function HomePage() {
 
             <div className="lg:col-span-5 bg-[#EEF3F6] p-5 sm:p-6 rounded-lg border border-gray-200 text-center space-y-3 min-w-0">
               <h3 className="font-bold text-base text-[#123B5D] break-words">
-                Need Bulk Enterprise Production?
+                Ordering for a School or Business?
               </h3>
 
               <p className="text-xs text-gray-600 leading-relaxed">
-                We offer custom quotes and fabric samples for schools, security
-                organizations, and corporate teams across Rwanda.
+                We offer custom quotes and fabric samples for schools, security organizations, and corporate teams in Rwanda and beyond.
               </p>
 
               <a
@@ -391,12 +281,12 @@ export default function HomePage() {
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="bg-[#111111] text-white rounded-lg p-5 sm:p-8 lg:p-12 text-center space-y-6 border-2 border-[#F28C28]">
             <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight break-words">
-              Ready to Craft Your Garments?
+              Let’s Talk About Your Order
             </h2>
 
             <p className="text-xs sm:text-sm text-gray-300 max-w-xl mx-auto leading-relaxed">
-              Get in touch with our Kigali atelier team or place a custom
-              fitting order today.
+              Tell us what you need, and our team will help you choose the right option or plan
+               a made-to-order garment.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
