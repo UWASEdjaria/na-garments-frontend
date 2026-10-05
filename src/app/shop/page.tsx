@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback, ChangeEvent } from 'react';
+import { Suspense,useState, useEffect, useMemo, useCallback, ChangeEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'name';
 
 const ITEMS_PER_PAGE = 12; // 12 items work seamlessly across 1, 2, 3, and 4 column grid layouts
 
-export default function ShopPage() {
+function ShopContent() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -348,16 +348,6 @@ export default function ShopPage() {
                 </div>
                    )}
 
-                   {/* Stock Badge */}
-                    <span
-                      className={`absolute top-2 left-2 sm:top-3 sm:left-3 text-[9px] sm:text-[10px] font-extrabold uppercase px-2 sm:px-2.5 py-1 rounded-md shadow-sm ${
-                      isOutOfStock
-                      ? 'bg-red-600 text-white'
-                      : 'bg-[#F28C28] text-[#111111]'
-                      }`}
-                      >
-                     {isOutOfStock ? 'Out of Stock' : 'In Stock'}
-                    </span>
 
                  {/* Wishlist Button */}
                    <button
@@ -544,5 +534,12 @@ export default function ShopPage() {
 
       <Footer />
     </div>
+  );
+}
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<div>Loading shop...</div>}>
+      <ShopContent />
+    </Suspense>
   );
 }
