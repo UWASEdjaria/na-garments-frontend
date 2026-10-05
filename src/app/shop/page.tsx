@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, ChangeEvent } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
@@ -8,29 +9,35 @@ import Footer from '@/app/components/Footer';
 import { Product, Category } from '@/app/types';
 import { productService } from '@/app/services/product.service';
 import { cartService } from '@/app/services/cart.service';
+import { FiHeart } from 'react-icons/fi';
+import { wishlistService } from '@/app/services/wishlist.service';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'name';
 
 const ITEMS_PER_PAGE = 12; // 12 items work seamlessly across 1, 2, 3, and 4 column grid layouts
 
 export default function ShopPage() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search')?.trim() || '');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [addedProductId, setAddedProductId] = useState<string | null>(null);
-
+  
+  const [wishlistProductIds, setWishlistProductIds] = useState<string[]>([]);
+  const [wishlistLoadingId, setWishlistLoadingId] = useState<string | null>(null);
   const loadData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
+      const search = searchParams.get('search')?.trim() || '';
       const [fetchedProducts, fetchedCategories] = await Promise.all([
-        productService.getProducts(),
+        productService.getProducts({search}),
         productService.getCategories(),
       ]);
       setProducts(fetchedProducts);
@@ -44,11 +51,27 @@ export default function ShopPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+  useEffect(() => {
+  const loadWishlist = async () => {
+    if (!localStorage.getItem('token')) return;
+
+    try {
+      const response = await wishlistService.getWishlist();
+      setWishlistProductIds(
+        response.data.map((item) => item.productId)
+      );
+    } catch {
+      setWishlistProductIds([]);
+    }
+  };
+
+  loadWishlist();
+}, []);
 
   // Reset to page 1 whenever filters or search change
   useEffect(() => {
@@ -117,6 +140,30 @@ export default function ShopPage() {
     setTimeout(() => setAddedProductId(null), 1800);
   };
 
+  const handleWishlistToggle = async (productId: string) => {
+  const isWishlisted = wishlistProductIds.includes(productId);
+
+  setWishlistLoadingId(productId);
+
+  try {
+    if (isWishlisted) {
+      await wishlistService.removeItem(productId);
+
+      setWishlistProductIds((current) =>
+        current.filter((id) => id !== productId)
+      );
+    } else {
+      await wishlistService.addItem(productId);
+
+      setWishlistProductIds((current) => [
+        ...current,
+        productId,
+      ]);
+    }
+  } finally {
+    setWishlistLoadingId(null);
+  }
+};
   return (
     <div className="min-h-screen w-full min-w-0 flex flex-col bg-[#EEF3F6] text-[#111111] antialiased selection:bg-[#F28C28] selection:text-white overflow-x-hidden">
       <Navbar />
@@ -154,7 +201,7 @@ export default function ShopPage() {
                   placeholder="Search garments by name or description..."
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="w-full min-w-0 bg-[#EEF3F6] text-[#111111] placeholder-gray-500 text-xs sm:text-sm pl-10 pr-9 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#123B5D] focus:bg-white transition-all"
+                  className="w-full min-w-0 bg-[#EEF3F6] text-[#111111] placeholder-gray-500 text-xs sm:text-sm pl-10 pr-9 py-1.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#123B5D] focus:bg-white transition-all"
                 />
                 {searchQuery && (
                   <button
@@ -283,61 +330,80 @@ export default function ShopPage() {
                       className="bg-white rounded-xl border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-md hover:border-[#123B5D]/30 transition-all duration-200 flex flex-col group min-w-0"
                     >
                       {/* Image Preview Container */}
-                      <div className="relative aspect-[4/3] min-h-40 sm:min-h-48 w-full bg-[#EEF3F6] overflow-hidden flex items-center justify-center border-b border-gray-100">
-                        {imageUrl && imageUrl !== '/images/placeholder-garment.jpg' ? (
-                          <Image
-                            src={imageUrl}
-                            alt={product.name}
-                            fill
-                            unoptimized
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center text-gray-400 p-4 text-center">
-                            <svg className="w-10 h-10 mb-1 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span className="text-[10px] font-medium tracking-wide uppercase">NA-Garments</span>
-                          </div>
-                        )}
+                 {/* Product Image Container - Full Image (No Cropping) */}
+                 <div className="relative aspect-square w-full bg-[#F8FAFC] p-3 overflow-hidden flex items-center justify-center border-b border-gray-100"> 
+                    {imageUrl && imageUrl !== '/images/placeholder-garment.jpg' ? (
+                  <Image
+                     src={imageUrl}
+                     alt={product.name}
+                     fill
+                     unoptimized
+                     className="object-contain group-hover:scale-105 transition-transform duration-300 p-2"
+                     />
+                     ) : (
+                     <div className="flex flex-col items-center justify-center text-gray-400 p-4 text-center">
+                    <svg className="w-10 h-10 mb-1 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6" />
+                  </svg>
+                </div>
+                   )}
 
-                        {/* Stock Badge */}
-                        <span
-                            className={`absolute top-2 left-2 sm:top-3 sm:left-3 text-[9px] sm:text-[10px] font-extrabold uppercase px-2 sm:px-2.5 py-1 rounded-md shadow-sm ${
-                            isOutOfStock
-                              ? 'bg-red-600 text-white'
-                              : 'bg-[#F28C28] text-[#111111]'
-                          }`}
-                        >
-                          {isOutOfStock ? 'Out of Stock' : 'In Stock'}
-                        </span>
-                      </div>
+                   {/* Stock Badge */}
+                    <span
+                      className={`absolute top-2 left-2 sm:top-3 sm:left-3 text-[9px] sm:text-[10px] font-extrabold uppercase px-2 sm:px-2.5 py-1 rounded-md shadow-sm ${
+                      isOutOfStock
+                      ? 'bg-red-600 text-white'
+                      : 'bg-[#F28C28] text-[#111111]'
+                      }`}
+                      >
+                     {isOutOfStock ? 'Out of Stock' : 'In Stock'}
+                    </span>
+
+                 {/* Wishlist Button */}
+                   <button
+                       type="button"
+                       onClick={() => handleWishlistToggle(product.id)}
+                       disabled={wishlistLoadingId === product.id}
+                       aria-label={
+                       wishlistProductIds.includes(product.id)
+                       ? 'Remove from wishlist'
+                       : 'Add to wishlist'
+                       }
+                       className={`absolute top-2 right-2 sm:top-3 sm:right-3 z-10 w-9 h-9 rounded-full flex items-center justify-center shadow-sm transition-all ${
+                        wishlistProductIds.includes(product.id)
+                        ? 'bg-[#F28C28] text-[#111111]'
+                        : 'bg-white/90 text-[#123B5D] hover:bg-[#F28C28] hover:text-[#111111]'
+                       }`}
+                     >
+                     <FiHeart className="w-5 h-5" />
+                    </button>
+                   </div>
 
                       {/* Card Content */}
-                      <div className="p-3 sm:p-5 flex-grow flex flex-col justify-between space-y-4 min-w-0">
-                        <div className="space-y-2 min-w-0">
+                      <div className="p-2 sm:p-3 flex-grow flex flex-col justify-between space-y-1 min-w-0">
+                        <div className="space-y-1 min-w-0">
                           {product.category?.name && (
                             <span className="text-[10px] font-extrabold text-[#123B5D] uppercase tracking-wider block [overflow-wrap:anywhere]">
                               {product.category.name}
                             </span>
                           )}
 
-                          <h2 className="font-bold text-sm sm:text-base text-[#111111] line-clamp-2 [overflow-wrap:anywhere] group-hover:text-[#F28C28] transition-colors">
+                          <h2 className="font-bold text-sm sm:text-base text-[#111111] line-clamp-1 [overflow-wrap:anywhere] group-hover:text-[#F28C28] transition-colors">
                             {product.name}
                           </h2>
 
-                          <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed min-h-[2.25rem] [overflow-wrap:anywhere]">
+                           <p className="text-xs text-gray-500 line-clamp-1 leading-relaxed min-h-0 leading-tight [overflow-wrap:anywhere]">                          
                             {product.description || 'Custom tailored garment crafted with premium materials.'}
                           </p>
 
                           {/* Sizes */}
                           {product.sizes && product.sizes.length > 0 && (
-                            <div className="pt-1 flex items-center gap-1.5 flex-wrap min-w-0">
+                            <div className="pt-1 flex items-center gap-1 flex-wrap min-w-0">
                               <span className="text-[10px] text-gray-400 font-bold uppercase">Sizes:</span>
                               {product.sizes.slice(0, 4).map((size: string) => (
                                 <span
                                   key={size}
-                                  className="max-w-full text-[10px] font-bold bg-[#EEF3F6] text-[#123B5D] px-1.5 py-0.5 rounded border border-gray-200/60 [overflow-wrap:anywhere]"
+                                  className="max-w-full text-[10px] font-bold bg-[#EEF3F6] text-[#123B5D] px-1 py-0 rounded border border-gray-200/60 [overflow-wrap:anywhere]"
                                 >
                                   {size}
                                 </span>
@@ -347,12 +413,12 @@ export default function ShopPage() {
 
                           {/* Colors */}
                           {product.colors && product.colors.length > 0 && (
-                            <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                            <div className="flex items-center gap-1 flex-wrap min-w-0">
                               <span className="text-[10px] text-gray-400 font-bold uppercase">Colors:</span>
                               {product.colors.slice(0, 3).map((color: string) => (
                                 <span
                                   key={color}
-                                  className="max-w-full text-[10px] font-medium text-gray-600 capitalize bg-gray-50 px-1.5 py-0.5 rounded border border-gray-200/60 [overflow-wrap:anywhere]"
+                                  className="max-w-full text-[10px] font-medium text-gray-600 capitalize bg-gray-50 px-1 py-0 rounded border border-gray-200/60 [overflow-wrap:anywhere]"
                                 >
                                   {color}
                                 </span>
@@ -362,7 +428,7 @@ export default function ShopPage() {
                         </div>
 
                         {/* Pricing & Actions */}
-                        <div className="pt-3 border-t border-gray-100 space-y-3">
+                        <div className="pt-1 border-t border-gray-100 space-y-1">
                           <div className="flex flex-col min-[380px]:flex-row min-[380px]:items-baseline justify-between gap-1.5 min-w-0">
                             <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Price</span>
                             <span className="font-black text-sm sm:text-base text-[#123B5D] tracking-tight [overflow-wrap:anywhere]">
@@ -373,7 +439,7 @@ export default function ShopPage() {
                           <div className="grid grid-cols-1 min-[640px]:grid-cols-2 gap-2">
                             <Link
                               href={`/shop/${product.id}`}
-                              className="w-full min-w-0 bg-[#EEF3F6] text-[#123B5D] hover:bg-[#123B5D] hover:text-white font-bold text-xs leading-tight px-2 py-2.5 rounded-lg text-center transition-all flex items-center justify-center min-h-[38px] break-words"
+                              className="w-full min-w-0 bg-[#EEF3F6] text-[#123B5D] hover:bg-[#123B5D] hover:text-white font-bold text-xs leading-tight px-2 py-2.5 rounded-lg text-center transition-all flex items-center justify-center min-h-[30px] break-words"
                             >
                               View Details
                             </Link>
@@ -381,7 +447,7 @@ export default function ShopPage() {
                             <button
                               onClick={() => handleAddToCart(product)}
                               disabled={isOutOfStock}
-                              className={`w-full min-w-0 font-bold text-xs leading-tight px-2 py-2.5 rounded-lg transition-all flex items-center justify-center min-h-[38px] break-words ${
+                              className={`w-full min-w-0 font-bold text-xs leading-tight px-2 py-2.5 rounded-lg transition-all flex items-center justify-center min-h-[30px] break-words ${
                                 isOutOfStock
                                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                   : addedProductId === product.id

@@ -29,7 +29,7 @@ export interface ProductCard {
   currency: string;
   categoryName: string;
   imageUrl: string;
-  tag?: string;
+  isCustomizable: boolean;
 }
 
 /**
@@ -48,6 +48,7 @@ export interface FeaturePillar {
   id: string;
   title: string;
   description: string;
+  iconType: string;
 }
 export interface FooterLink {
   label: string;
@@ -74,6 +75,7 @@ export interface Category {
   name: string;
   slug: string;
   description?: string;
+  imageUrl?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -106,7 +108,7 @@ export interface CartItem {
   color?: string | null;
 }
 export interface ProductQueryParams {
-  name?: string;
+  search?: string;
   categoryId?: string;
   slug?: string;
   page?: number;
