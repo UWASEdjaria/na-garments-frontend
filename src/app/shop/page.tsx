@@ -11,6 +11,8 @@ import { productService } from '@/app/services/product.service';
 import { cartService } from '@/app/services/cart.service';
 import { FiHeart } from 'react-icons/fi';
 import { wishlistService } from '@/app/services/wishlist.service';
+import FadeIn from '../components/animations/FadeIn';
+import SlideUp from '../components/animations/SlideUp';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'name';
 
@@ -172,20 +174,27 @@ function ShopContent() {
         {/* Banner Section */}
         <section className="bg-[#123B5D] text-white py-8 sm:py-14 px-3 sm:px-6 lg:px-8 border-b-4 border-[#F28C28] shadow-md">
           <div className="max-w-7xl w-full min-w-0 mx-auto text-center space-y-2.5">
+            <FadeIn>
             <span className="inline-block max-w-full break-words text-[10px] sm:text-xs font-bold text-[#F28C28] uppercase tracking-widest bg-[#123B5D]/60 px-3 py-1 rounded-full border border-[#F28C28]/30">
-              Bespoke & Ready-To-Wear
+              Request a Quote & Ready-To-Wear
             </span>
+          </FadeIn>
+           <FadeIn delay={0.1}>
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight break-words">
               Our Collection
             </h1>
+            </FadeIn>
+           <FadeIn delay={0.2}>
             <p className="text-xs sm:text-sm text-[#EEF3F6]/90 max-w-xl mx-auto leading-relaxed break-words">
               Explore precision-cut menswear, institutional apparel, and master-tailored garments handcrafted in Kigali.
             </p>
+            </FadeIn>
           </div>
         </section>
 
         {/* Search, Filter & Controls Header */}
         <section className="max-w-7xl w-full min-w-0 mx-auto px-3 sm:px-6 lg:px-8 pt-5 sm:pt-8 lg:pt-10">
+          <SlideUp>
           <div className="bg-white p-3 sm:p-5 rounded-xl border border-gray-200/80 shadow-sm space-y-4 min-w-0">
             
             {/* Top Bar: Search Input & Sort Dropdown */}
@@ -259,6 +268,7 @@ function ShopContent() {
               ))}
             </div>
           </div>
+          </SlideUp>
         </section>
 
         {/* Product Grid Area */}
@@ -318,6 +328,7 @@ function ShopContent() {
           {!isLoading && !error && filteredProducts.length > 0 && (
             <>
               {/* Product Grid */}
+              <SlideUp>
               <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
                 {paginatedProducts.map((product: Product) => {
                   const imageUrl = productService.getPrimaryImageUrl(product);
@@ -338,7 +349,7 @@ function ShopContent() {
                      alt={product.name}
                      fill
                      unoptimized
-                     className="object-contain group-hover:scale-105 transition-transform duration-300 p-2"
+                     className="object-contain sm:group-hover:scale-105 sm:transition-transform sm:duration-300 p-2"
                      />
                      ) : (
                      <div className="flex flex-col items-center justify-center text-gray-400 p-4 text-center">
@@ -346,6 +357,7 @@ function ShopContent() {
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6" />
                   </svg>
                 </div>
+                
                    )}
 
 
@@ -381,46 +393,16 @@ function ShopContent() {
                           <h2 className="font-bold text-sm sm:text-base text-[#111111] line-clamp-1 [overflow-wrap:anywhere] group-hover:text-[#F28C28] transition-colors">
                             {product.name}
                           </h2>
-
-                           <p className="text-xs text-gray-500 line-clamp-1 leading-relaxed min-h-0 leading-tight [overflow-wrap:anywhere]">                          
+                           <p className="text-xs text-gray-500 line-clamp-1 leading-relaxed min-h-[2.5rem] [overflow-wrap:anywhere]">                          
                             {product.description || 'Custom tailored garment crafted with premium materials.'}
                           </p>
 
-                          {/* Sizes */}
-                          {product.sizes && product.sizes.length > 0 && (
-                            <div className="pt-1 flex items-center gap-1 flex-wrap min-w-0">
-                              <span className="text-[10px] text-gray-400 font-bold uppercase">Sizes:</span>
-                              {product.sizes.slice(0, 4).map((size: string) => (
-                                <span
-                                  key={size}
-                                  className="max-w-full text-[10px] font-bold bg-[#EEF3F6] text-[#123B5D] px-1 py-0 rounded border border-gray-200/60 [overflow-wrap:anywhere]"
-                                >
-                                  {size}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-
-                          {/* Colors */}
-                          {product.colors && product.colors.length > 0 && (
-                            <div className="flex items-center gap-1 flex-wrap min-w-0">
-                              <span className="text-[10px] text-gray-400 font-bold uppercase">Colors:</span>
-                              {product.colors.slice(0, 3).map((color: string) => (
-                                <span
-                                  key={color}
-                                  className="max-w-full text-[10px] font-medium text-gray-600 capitalize bg-gray-50 px-1 py-0 rounded border border-gray-200/60 [overflow-wrap:anywhere]"
-                                >
-                                  {color}
-                                </span>
-                              ))}
-                            </div>
-                          )}
+                         
                         </div>
 
                         {/* Pricing & Actions */}
                         <div className="pt-1 border-t border-gray-100 space-y-1">
                           <div className="flex flex-col min-[380px]:flex-row min-[380px]:items-baseline justify-between gap-1.5 min-w-0">
-                            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Price</span>
                             <span className="font-black text-sm sm:text-base text-[#123B5D] tracking-tight [overflow-wrap:anywhere]">
                               {formattedPrice} <span className="text-xs font-bold text-gray-500">RWF</span>
                             </span>
@@ -453,10 +435,13 @@ function ShopContent() {
                     </div>
                   );
                 })}
+              
               </div>
+              </SlideUp>
 
               {/* Responsive Pagination Controls */}
               {totalPages > 1 && (
+                  <FadeIn delay={0.15}>
                 <div className="mt-8 sm:mt-12 bg-white rounded-xl border border-gray-200/80 p-3 sm:p-5 flex flex-col lg:flex-row items-center justify-between gap-4 shadow-sm min-w-0">
                   {/* Item Counter */}
                   <div className="text-[11px] sm:text-xs text-gray-500 font-medium text-center lg:text-left break-words">
@@ -526,9 +511,11 @@ function ShopContent() {
                     </button>
                   </div>
                 </div>
+                </FadeIn>
               )}
             </>
           )}
+          
         </section>
       </main>
 

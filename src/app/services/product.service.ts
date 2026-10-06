@@ -19,6 +19,11 @@ export const productService = {
   /**
    * Fetches categories using central Axios client
    */
+  async getProductById(id: string): Promise<Product> {
+  const response = await api.get<Product>(`/products/${id}`);
+  return response.data;
+  },
+
   async getCategories(): Promise<Category[]> {
     try {
       const response = await api.get<Category[] | { data: Category[] }>('/categories');
