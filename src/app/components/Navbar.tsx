@@ -57,13 +57,13 @@ export default function Navbar() {
       </div>
 
       {/* Main Navigation Header */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8  min-h-20 sm:min-h-24 py-2 flex items-center justify-between gap-3 sm:gap-6">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 min-h-20 sm:min-h-24 py-2 flex items-center justify-between gap-1 sm:gap-6">
         {/* Brand Logo */}
         <Link
         href="/"
         className="flex items-center shrink-0 group focus:outline-none"
         >
-        <div className="relative w-44 h-14 sm:w-60 sm:h-18 lg:h-20 flex items-center justify-center overflow-hidden">
+        <div className="relative w-32 h-12 sm:w-60 sm:h-18 lg:h-20 flex items-center justify-center overflow-hidden">
           <Image
            src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790878768/For_a_white_background.png"
             alt="NA-GARMENTS"
@@ -92,7 +92,7 @@ export default function Navbar() {
         </nav>
 
         {/* Header Utilities / Action Icons */}
-        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-0.5 sm:gap-3 shrink-0">
           {/* Search Toggle */}
           <button
             type="button"
@@ -187,7 +187,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 text-[#123B5D] hover:text-[#F28C28] hover:bg-[#EEF3F6] rounded transition-colors focus:outline-none ml-1 min-w-[42px] min-h-[42px] flex items-center justify-center"
+            className="lg:hidden p-2 text-[#123B5D] hover:text-[#F28C28] hover:bg-[#EEF3F6] rounded transition-colors focus:outline-none min-w-[42px] min-h-[42px] flex items-center justify-center"
             aria-label="Toggle Navigation Menu"
           >
             <svg
@@ -245,7 +245,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-[#111111] border-t border-[#123B5D] px-4 pt-4 pb-6 space-y-4 animate-in slide-in-from-top duration-200">
+        <div className="lg:hidden max-h-[calc(100dvh-8rem)] overflow-y-auto overscroll-contain bg-[#111111] border-t border-[#123B5D] px-4 pt-4 pb-6 space-y-4 animate-in slide-in-from-top duration-200">
           <nav className="flex flex-col space-y-2">
             {NAV_LINKS.map((link) => (
               <Link

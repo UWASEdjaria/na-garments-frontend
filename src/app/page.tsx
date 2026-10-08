@@ -1,4 +1,6 @@
-
+import FadeIn from '@/app/components/animations/FadeIn';
+import SlideUp from '@/app/components/animations/SlideUp';
+import MarqueeText from '@/app/components/animations/MarqueeText';
 import Image from 'next/image';
 import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
@@ -35,9 +37,13 @@ export default function HomePage() {
           {/* Hero Content */}
           <div className="relative z-10 max-w-7xl mx-auto w-full">
             <div className="max-w-2xl space-y-6 text-center sm:text-left">
+             <FadeIn>
               <span className="inline-block bg-[#F28C28] text-[#111111] text-xs font-bold px-3 py-1 rounded uppercase tracking-widest">
                 Precision Apparel & Bespoke Fitting
               </span>
+             </FadeIn>
+
+             <FadeIn delay={0.1}>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight break-words">
                 Custom Tailoring & Quality Apparel in Kigali
@@ -46,11 +52,15 @@ export default function HomePage() {
                   Made to Fit Your Needs.
                 </span>
               </h1>
-
+              </FadeIn>
+              
+             <FadeIn delay={0.2}>
               <p className="text-sm sm:text-base lg:text-lg text-[#EEF3F6]/90 max-w-2xl mx-auto sm:mx-0 leading-relaxed break-words">
                 We make practical, well-fitted clothing for schools, workplaces, businesses, and everyday wear, with options for both
                 ready-made and made-to-measure orders in Kigali.
               </p>
+             </FadeIn>
+              <FadeIn delay={0.3}>
 
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-3 sm:gap-4">
                 <Link
@@ -67,7 +77,9 @@ export default function HomePage() {
                   Order Custom Garment
                 </Link>
               </div>
-
+            </FadeIn>
+            
+             <FadeIn delay={0.4}>
               {/* Trust Badges */}
               <div className="pt-6 grid grid-cols-1 min-[400px]:grid-cols-3 gap-4 min-[400px]:gap-2 border-t border-white/20 text-center max-w-md mx-auto sm:mx-0 text-xs text-[#EEF3F6]/80">
                 <div>
@@ -91,11 +103,66 @@ export default function HomePage() {
                   Kigali Atelier
                 </div>
               </div>
+             </FadeIn>
             </div>
           </div>
         </section>
+        
+        {/* 2. Moving Brand Strip */}
+        <section className="bg-white border-y border-[#EEF3F6] py-4">
+          <MarqueeText duration={35}>
+            <div className="flex items-center gap-8 px-4">
+              <span className="text-sm font-semibold uppercase tracking-widest text-[#123B5D]">
+                Custom Tailoring
+              </span>
 
-        {/* 2. Featured Categories */}
+              <span className="text-[#F28C28]">•</span>
+
+              <span className="text-sm font-semibold uppercase tracking-widest text-[#123B5D]">
+                Ready-to-Wear
+              </span>
+
+              <span className="text-[#F28C28]">•</span>
+
+              <span className="text-sm font-semibold uppercase tracking-widest text-[#123B5D]">
+                Institutional Uniforms
+              </span>
+
+              <span className="text-[#F28C28]">•</span>
+
+              <span className="text-sm font-semibold uppercase tracking-widest text-[#123B5D]">
+                Industrial Workwear
+              </span>
+
+              <span className="text-[#F28C28]">•</span>
+
+              <span className="text-sm font-semibold uppercase tracking-widest text-[#123B5D]">
+                Men&apos;s Fashion
+              </span>
+
+              <span className="text-[#F28C28]">•</span>
+
+              <span className="text-sm font-semibold uppercase tracking-widest text-[#123B5D]">
+                Made to Measure
+              </span>
+
+              <span className="text-[#F28C28]">•</span>
+
+              <span className="text-sm font-semibold uppercase tracking-widest text-[#123B5D]">
+                Quality Craftsmanship
+              </span>
+
+              <span className="text-[#F28C28]">•</span>
+
+              <span className="text-sm font-semibold uppercase tracking-widest text-[#123B5D]">
+                Designed For You
+              </span>
+
+              <span className="text-[#F28C28]">•</span>
+            </div>
+          </MarqueeText>
+        </section>
+        {/* 3. Featured Categories */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10 lg:mb-14">
             <span className="text-xs font-bold text-[#F28C28] uppercase tracking-widest block mb-1">
@@ -113,7 +180,7 @@ export default function HomePage() {
         <FeaturedCategories />
         </section>
 
-        {/* 3. Featured Products */}
+        {/* 4. Featured Products */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-10 gap-4">
             <div>
@@ -137,7 +204,7 @@ export default function HomePage() {
           <FeaturedProducts />
         </section>
 
-        {/* 4. Custom Tailoring CTA Section */}
+        {/* 5. Custom Tailoring CTA Section */}
         <section className="bg-[#123B5D] text-white py-12 sm:py-16 lg:py-20 border-y-4 border-[#F28C28]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12 lg:mb-16">
@@ -188,7 +255,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 5. Why Choose NA-GARMENTS */}
+        {/* 6. Why Choose NA-GARMENTS */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
             <span className="text-xs font-bold text-[#F28C28] uppercase tracking-widest block mb-1">
@@ -226,7 +293,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 6. About / Brand Introduction */}
+        {/* 7. About / Brand Introduction */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center shadow-sm min-w-0">
             <div className="lg:col-span-7 space-y-4 min-w-0">
@@ -277,7 +344,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 7. Contact CTA Banner */}
+        {/* 8. Contact CTA Banner */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="bg-[#111111] text-white rounded-lg p-5 sm:p-8 lg:p-12 text-center space-y-6 border-2 border-[#F28C28]">
             <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight break-words">
