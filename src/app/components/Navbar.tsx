@@ -6,15 +6,18 @@ import { useState } from 'react';
 import { useCartCount } from '../hooks/useCartCount';
 import { NAV_LINKS } from '../lib/constants';
 import Image from 'next/image';
-import { FiUser } from 'react-icons/fi';
+import { FiLogOut, FiUser } from 'react-icons/fi';
 import { useWishlistCount } from '../hooks/useWishlistCount';
+import useAuth from '../hooks/useAuth';
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const cartCount = useCartCount();
   const wishlistCount = useWishlistCount();
+  const { user, isLoading, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -66,7 +69,7 @@ export default function Navbar() {
         <div className="relative w-32 h-12 sm:w-60 sm:h-18 lg:h-20 flex items-center justify-center overflow-hidden">
           <Image
            src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790878768/For_a_white_background.png"
-            alt="NA-GARMENTS"
+            alt="nagarments"
             width={361}
             height={193}
             className="w-full h-full object-contain"
@@ -166,14 +169,74 @@ export default function Navbar() {
              </span>
           </Link>
 
-          {/* Account/Login Link */}
-          <Link
-            href="/account"
-            className="hidden sm:flex p-2 text-[#123B5D] hover:text-[#F28C28] hover:bg-[#EEF3F6] rounded-full transition-colors focus:outline-none min-w-[38px] min-h-[38px] items-center justify-center"
-            aria-label="Account Login"
-          >
-           <FiUser className="w-5 h-5" />
-          </Link>
+         
+          {/* Account / Profile */}
+          <div className="relative hidden sm:block">
+                {isLoading ? (
+          <div className="h-[38px] w-[38px]" />
+                 ) : user ? (
+           <>
+           <button
+               type="button"
+               onClick={() => setIsProfileOpen(!isProfileOpen)}
+               className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full p-2 text-[#123B5D] transition-colors hover:bg-[#EEF3F6] hover:text-[#F28C28] focus:outline-none"
+               aria-label="Open account menu"
+            >
+             <FiUser className="h-5 w-5" />
+           </button>
+        {isProfileOpen && (
+          <div className="absolute right-0 top-12 z-50 w-56 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
+           <div className="border-b border-gray-100 px-3 py-2">
+              <p className="text-sm font-bold text-[#111111]">
+                Hi, {user.name}
+              </p>
+
+              <p className="truncate text-xs text-gray-500">
+                {user.email}
+              </p>
+             </div>
+
+               <Link
+               href="/account"
+               className="block rounded-lg px-3 py-2 text-sm font-semibold text-[#111111] transition hover:bg-[#EEF3F6] hover:text-[#123B5D]"
+               >
+               My Account
+               </Link>
+
+                 {user.role === 'ADMIN' && (
+               <Link
+                  href="/admin/dashboard"
+                  className="block rounded-lg px-3 py-2 text-sm font-semibold text-[#123B5D] transition hover:bg-[#EEF3F6] hover:text-[#F28C28]"
+                >
+                 Admin Dashboard
+               </Link>
+              )}
+
+              <button
+                 type="button"
+                 onClick={() => {
+                 logout();
+                 setIsProfileOpen(false);
+                 }}
+                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                >
+                <FiLogOut className="h-4 w-4" />
+                Logout
+               </button>
+             </div>
+        )}
+            </>
+           ) : (
+            <Link
+               href="/auth/login"
+              className="flex min-h-[38px] min-w-[38px] items-center justify-center gap-2 rounded-full p-2 text-[#123B5D] transition-colors hover:bg-[#EEF3F6] hover:text-[#F28C28] focus:outline-none"
+               aria-label="Login"
+             >
+            <FiUser className="h-5 w-5" />
+            <span className="hidden xl:inline">Login</span>
+            </Link>
+           )}
+          </div>
 
           {/* CTA Button */}
           <Link
@@ -214,6 +277,7 @@ export default function Navbar() {
             </svg>
           </button>
         </div>
+       
       </div>
 
       {/* Search Input Bar */}

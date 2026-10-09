@@ -16,15 +16,15 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://nagarments.com"),
 
   title: {
-    template: "%s | NA-GARMENTS",
-    default: "NA-GARMENTS | Clothing Made for Work, School & Everyday Life",
+    template: "%s | nagarments",
+    default: "nagarments | Clothing Made for Work, School & Everyday Life",
   },
 
   description:
-    "NA-GARMENTS makes school uniforms, workwear, men’s clothing, ready-to-wear garments, and custom clothing in Kigali, Rwanda.",
+    "nagarments makes school uniforms, workwear, men’s clothing, ready-to-wear garments, and custom clothing in Kigali, Rwanda.",
 
   keywords: [
-    "NA-GARMENTS",
+    "nagarments",
     "tailoring in Kigali",
     "clothing in Kigali",
     "school uniforms Rwanda",
@@ -35,11 +35,11 @@ export const metadata: Metadata = {
   ],
 
   openGraph: {
-    title: "NA-GARMENTS | Clothing Made for Work, School & Everyday Life",
+    title: "nagarments | Clothing Made for Work, School & Everyday Life",
     description:
       "School uniforms, workwear, men’s clothing, ready-to-wear garments, and custom clothing made in Kigali, Rwanda.",
     url: "https://nagarments.com",
-    siteName: "NA-GARMENTS",
+    siteName: "nagarments",
     type: "website",
     locale: "en_RW",
   },

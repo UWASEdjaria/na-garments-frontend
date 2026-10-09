@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
+import LoginSuccessNotice from '@/app/components/auth/LoginSuccessNotice';
 import { CONTACT_INFO, TAILORING_STEPS, WHY_CHOOSE_US } from './lib/constants';
 import FeaturedProducts from './components/FeaturedProducts';
 import FeaturedCategories from './components/FeaturedCategories';
@@ -14,6 +15,10 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#EEF3F6] text-[#111111] overflow-x-hidden">
       <Navbar />
+      <div className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+        <LoginSuccessNotice />
+      </div>
+
 
       <main className="flex-grow space-y-12 sm:space-y-16 lg:space-y-24 pb-12 sm:pb-16 lg:pb-24">
         {/* 1. Hero Section */}
@@ -22,7 +27,7 @@ export default function HomePage() {
           <div className="absolute inset-0 z-0">
             <Image
               src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1791035645/maiye-jeremiah-yIWFOg5yidA-unsplash.jpg"
-              alt="NA-GARMENTS Bespoke Fitting & Tailoring"
+              alt="nagarments Bespoke Fitting & Tailoring"
               fill
               priority
               sizes="100vw"
@@ -30,7 +35,7 @@ export default function HomePage() {
               className="object-cover object-[70%_center] sm:object-[70%_center] lg:object-[75%_center]"
             />
 
-            {/* Overlay using NA-GARMENTS brand colors */}
+            {/* Overlay using nagarments brand colors */}
             <div className="absolute inset-0 bg-gradient-to-r from-[#123B5D]/95 via-[#123B5D]/85 to-[#111111]/40 sm:from-[#123B5D]/95 sm:via-[#123B5D]/80 sm:to-[#111111]/25" />
           </div>
 
@@ -255,7 +260,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 6. Why Choose NA-GARMENTS */}
+        {/* 6. Why Choose nagarments */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
             <span className="text-xs font-bold text-[#F28C28] uppercase tracking-widest block mb-1">
@@ -298,7 +303,7 @@ export default function HomePage() {
           <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center shadow-sm min-w-0">
             <div className="lg:col-span-7 space-y-4 min-w-0">
               <span className="text-xs font-bold text-[#F28C28] uppercase tracking-widest block">
-                About NA-GARMENTS
+                About nagarments
               </span>
 
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#123B5D] break-words">
@@ -306,7 +311,7 @@ export default function HomePage() {
               </h2>
 
               <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                NA-GARMENTS is based in Kagugu, Batsinda, near Batsinda Bus Park in Kigali. We make school uniforms, workwear, men’s clothing, ready-to-wear pieces, and clothing made 
+                nagarments is based in Kagugu, Batsinda, near Batsinda Bus Park in Kigali. We make school uniforms, workwear, men’s clothing, ready-to-wear pieces, and clothing made
                 to order for individuals, schools, and businesses.
               </p>
 

@@ -127,7 +127,7 @@ export default function CustomOrderForm() {
               </h3>
 
               <p className="mt-1 text-sm text-gray-600">
-                Thank you for choosing NA-GARMENTS. We have received your
+                Thank you for choosing nagarments. We have received your
                 custom order request and our team will review it shortly.
               </p>
 

@@ -31,13 +31,13 @@ export default function Footer() {
             <Link href="/" className="inline-block focus:outline-none py-1">
               <img
                 src="https://res.cloudinary.com/ziwgo9pj/image/upload/f_auto,q_auto,w_800/v1790878768/For_a_dark_background.png"
-                alt="NA-GARMENTS"
+                alt="nagarments"
                 className="h-16 sm:h-20 lg:h-24 w-auto object-contain object-left"
                 loading="eager"
               />
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed max-w-sm">
-              NA-GARMENTS is Rwanda’s premier apparel manufacturer and bespoke tailoring studio. We produce tailored school uniforms, industrial workwear, and bespoke men’s fashion crafted for precision, fit, and endurance.
+              nagarments is Rwanda’s premier apparel manufacturer and bespoke tailoring studio. We produce tailored school uniforms, industrial workwear, and bespoke men’s fashion crafted for precision, fit, and endurance.
             </p>
             <div className="pt-2">
               <span className="inline-block text-xs font-semibold text-[#F28C28] uppercase tracking-widest bg-[#123B5D]/40 px-3 py-1 rounded border border-[#123B5D]">
@@ -156,7 +156,7 @@ export default function Footer() {
 
         {/* Section 7: Footer Bottom */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 text-center sm:text-left">
-          <p>© {new Date().getFullYear()} NA-GARMENTS. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} nagarments. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">
               Privacy Policy
