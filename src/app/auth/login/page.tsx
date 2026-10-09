@@ -43,14 +43,14 @@ export default function LoginPage() {
                 className="object-cover"
               />
 
-              {/* Same NA-GARMENTS blue treatment as Home hero */}
+              {/* Same nagarments blue treatment as Home hero */}
               <div className="absolute inset-0 bg-gradient-to-r from-[#123B5D]/95 via-[#123B5D]/80 to-[#111111]/25" />
 
               {/* Image Content */}
               <div className="relative z-10 flex h-full items-end p-5 text-white sm:p-7 lg:p-8">
                 <div className="max-w-lg">
-                  <p className="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-[#F28C28]">
-                    NA-GARMENTS
+                  <p className="mb-2 text-xs font-bold tracking-[0.25em] text-[#F28C28]">
+                    nagarments
                   </p>
 
                   <h2 className="text-2xl font-extrabold leading-tight sm:text-3xl lg:text-4xl">

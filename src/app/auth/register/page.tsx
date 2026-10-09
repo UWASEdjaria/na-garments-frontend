@@ -44,8 +44,8 @@ export default function RegisterPage() {
 
               <div className="relative z-10 flex h-full items-end p-5 text-white sm:p-7 lg:p-8">
                 <div className="max-w-lg">
-                  <p className="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-[#F28C28]">
-                    NA-GARMENTS
+                  <p className="mb-2 text-xs font-bold tracking-[0.25em] text-[#F28C28]">
+                    nagarments
                   </p>
 
                   <h2 className="text-2xl font-extrabold leading-tight sm:text-3xl lg:text-4xl">

@@ -7,6 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FiArrowRight, FiMail } from 'react-icons/fi';
 import { z } from 'zod';
 
+
+import LoginSuccessMessage from './LoginSuccessMessage';
 import { forgotPasswordSchema } from '@/app/lib/validations/auth.schema';
 import { authService } from '@/app/services/auth.service';
 
@@ -49,8 +51,8 @@ export default function ForgotPasswordForm() {
   return (
     <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="mb-5">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#F28C28]">
-          NA-GARMENTS
+        <p className="text-xs font-bold tracking-[0.2em] text-[#F28C28]">
+          nagarments
         </p>
 
         <h1 className="mt-2 text-2xl font-extrabold text-[#123B5D] sm:text-3xl">
@@ -64,13 +66,10 @@ export default function ForgotPasswordForm() {
       </div>
 
       {successMessage && (
-        <div
-          role="status"
-          className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700"
-        >
-          {successMessage}
-        </div>
-      )}
+  <div className="mb-4">
+    <LoginSuccessMessage message={successMessage} />
+  </div>
+)}
 
       {errorMessage && (
         <div

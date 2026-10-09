@@ -12,8 +12,8 @@ import {
 export const authService = {
   register: async (
     data: RegisterRequest
-  ): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>(
+  ): Promise<MessageResponse> => {
+    const response = await api.post<MessageResponse>(
       '/auth/register',
       data
     );
@@ -61,6 +61,18 @@ export const authService = {
     const response = await api.post<MessageResponse>(
       '/auth/reset-password',
       data
+    );
+
+    return response.data;
+  },
+    verifyEmail: async (
+    token: string
+  ): Promise<MessageResponse> => {
+    const response = await api.get<MessageResponse>(
+      '/auth/verify-email',
+      {
+        params: { token },
+      }
     );
 
     return response.data;

@@ -69,7 +69,7 @@ export default function Navbar() {
         <div className="relative w-32 h-12 sm:w-60 sm:h-18 lg:h-20 flex items-center justify-center overflow-hidden">
           <Image
            src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790878768/For_a_white_background.png"
-            alt="NA-GARMENTS"
+            alt="nagarments"
             width={361}
             height={193}
             className="w-full h-full object-contain"

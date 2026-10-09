@@ -56,9 +56,7 @@ export default function RegisterForm() {
         confirmPassword: data.confirmPassword,
       });
 
-      const successMessage = `Welcome to NA-GARMENTS, ${response.data.user.name}! Your account has been created successfully. Please sign in to continue.`;
-
-      sessionStorage.setItem('registerSuccess', successMessage);
+      sessionStorage.setItem('registerSuccess', response.message);
       router.push('/auth/login');
     } catch (error) {
       console.error('Registration failed:', error);
@@ -72,8 +70,8 @@ export default function RegisterForm() {
   return (
     <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="mb-4">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#F28C28]">
-          NA-GARMENTS
+        <p className="text-xs font-bold tracking-[0.2em] text-[#F28C28]">
+          nagarments
         </p>
 
         <h1 className="mt-1.5 text-2xl font-extrabold text-[#123B5D] sm:text-3xl">

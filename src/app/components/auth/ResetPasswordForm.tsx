@@ -1,11 +1,12 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiArrowRight, FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
 import { z } from 'zod';
+import Link from 'next/link';
 
 import { resetPasswordSchema } from '@/app/lib/validations/auth.schema';
 import { authService } from '@/app/services/auth.service';
@@ -13,7 +14,6 @@ import { authService } from '@/app/services/auth.service';
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPasswordForm() {
-const router = useRouter();
 const searchParams = useSearchParams();
 const token = searchParams.get('token') ?? '';
 
@@ -48,11 +48,8 @@ try {
     confirmPassword: data.confirmPassword,
   });
 
-  setSuccessMessage(response.message);
+   setSuccessMessage(response.message);
 
-  setTimeout(() => {
-    router.push('/auth/login?reset=success');
-  }, 2000);
 } catch (error) {
   console.error('Reset password failed:', error);
   setErrorMessage(
@@ -65,8 +62,8 @@ try {
 
 };
 
-return ( <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6"> <div className="mb-5"> <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#F28C28]">
-NA-GARMENTS </p>
+return ( <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6"> <div className="mb-5"> <p className="text-xs font-bold tracking-[0.2em] text-[#F28C28]">
+nagarments </p>
 
     <h1 className="mt-2 text-2xl font-extrabold text-[#123B5D] sm:text-3xl">
       Reset Your Password
@@ -92,6 +89,17 @@ NA-GARMENTS </p>
       className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
     >
       {errorMessage}
+    </div>
+  )}
+    {(errorMessage || !token) && (
+    <div className="mb-4 text-sm text-gray-600">
+      Need a new password reset link?{' '}
+      <Link
+        href="/auth/forgot-password"
+        className="font-bold text-[#123B5D] transition-colors hover:text-[#F28C28]"
+      >
+        Request a New Reset Link
+      </Link>
     </div>
   )}
 

@@ -34,7 +34,7 @@ export default function AccountPage() {
                   My Account
                 </h1>
                 <p className="mt-1 text-sm text-gray-600">
-                  Your NA-GARMENTS profile
+                  Your nagarments profile
                 </p>
               </div>
 

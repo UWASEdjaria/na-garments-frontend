@@ -60,7 +60,7 @@ export default function LoginForm() {
         </p>
 
         <h1 className="text-2xl font-extrabold text-[#111111] sm:text-3xl">
-          Sign in to NA-GARMENTS
+          Sign in to nagarments
         </h1>
 
         <p className="mt-2 text-sm leading-relaxed text-gray-500">
