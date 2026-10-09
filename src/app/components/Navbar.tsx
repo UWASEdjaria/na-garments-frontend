@@ -1,13 +1,36 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useCartCount } from '../hooks/useCartCount';
 import { NAV_LINKS } from '../lib/constants';
 import Image from 'next/image';
+import { FiLogOut, FiUser } from 'react-icons/fi';
+import { useWishlistCount } from '../hooks/useWishlistCount';
+import useAuth from '../hooks/useAuth';
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const cartCount = useCartCount();
+  const wishlistCount = useWishlistCount();
+  const { user, isLoading, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  const query = searchQuery.trim();
+
+  if (!query) return;
+
+  router.push(`/shop?search=${encodeURIComponent(query)}`);
+  setIsSearchOpen(false);
+};
 
   return (
     <header className="sticky top-0 z-50 bg-white text-[#111111] shadow-md w-full overflow-x-hidden">
@@ -19,10 +42,10 @@ export default function Navbar() {
 
         <div className="hidden sm:flex items-center gap-4 text-xs shrink-0">
           <a
-            href="tel:+250788000000"
+            href="tel:+250781070569"
             className="hover:text-[#F28C28] transition-colors"
           >
-            +250 788 000 000
+            +250781070569
           </a>
 
           <span>|</span>
@@ -37,31 +60,21 @@ export default function Navbar() {
       </div>
 
       {/* Main Navigation Header */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 min-h-20 sm:min-h-24 py-2 flex items-center justify-between gap-1 sm:gap-6">
         {/* Brand Logo */}
         <Link
-          href="/"
-          className="flex items-center gap-2 shrink-0 group focus:outline-none"
+        href="/"
+        className="flex items-center shrink-0 group focus:outline-none"
         >
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-md bg-[#123B5D] flex items-center justify-center overflow-hidden">
-            <Image
-              src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790879861/75affa54-fc00-4a9c-b196-ac0892d8f8d6.png"
-              alt="NA-GARMENTS"
-              width={50}
-              height={50}
-              className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <span className="font-extrabold text-base sm:text-xl tracking-wider text-[#123B5D] uppercase leading-none group-hover:text-[#F28C28] transition-colors">
-              NA-GARMENTS
-            </span>
-
-            <span className="text-[9px] sm:text-[10px] text-[#111111]/70 font-medium tracking-widest uppercase mt-0.5">
-              Apparel & Tailoring
-            </span>
-          </div>
+        <div className="relative w-32 h-12 sm:w-60 sm:h-18 lg:h-20 flex items-center justify-center overflow-hidden">
+          <Image
+           src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790878768/For_a_white_background.png"
+            alt="nagarments"
+            width={361}
+            height={193}
+            className="w-full h-full object-contain"
+          />
+         </div>
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -70,7 +83,11 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-semibold text-[#111111] hover:text-[#F28C28] transition-colors tracking-wide py-2"
+              className={`text-sm font-semibold transition-colors tracking-wide py-2 ${
+                pathname === link.href
+                  ? 'text-[#F28C28]'
+                  : 'text-[#111111] hover:text-[#F28C28]'
+              }`}
             >
               {link.label}
             </Link>
@@ -78,7 +95,7 @@ export default function Navbar() {
         </nav>
 
         {/* Header Utilities / Action Icons */}
-        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-0.5 sm:gap-3 shrink-0">
           {/* Search Toggle */}
           <button
             type="button"
@@ -121,9 +138,10 @@ export default function Navbar() {
               />
             </svg>
 
-            <span className="absolute top-1 right-1 bg-[#F28C28] text-[#111111] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-              0
-            </span>
+          
+         <span className="absolute top-1 right-1 bg-[#F28C28] text-[#111111] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+         {wishlistCount}
+         </span>
           </Link>
 
           {/* Cart Link */}
@@ -146,31 +164,79 @@ export default function Navbar() {
               />
             </svg>
 
-            <span className="absolute top-1 right-1 bg-[#F28C28] text-[#111111] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-              0
-            </span>
+          <span className="absolute top-1 right-1 bg-[#F28C28] text-[#111111] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+             {cartCount}
+             </span>
           </Link>
 
-          {/* Account/Login Link */}
-          <Link
-            href="/account"
-            className="hidden sm:flex p-2 text-[#123B5D] hover:text-[#F28C28] hover:bg-[#EEF3F6] rounded-full transition-colors focus:outline-none min-w-[38px] min-h-[38px] items-center justify-center"
-            aria-label="Account Login"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+         
+          {/* Account / Profile */}
+          <div className="relative hidden sm:block">
+                {isLoading ? (
+          <div className="h-[38px] w-[38px]" />
+                 ) : user ? (
+           <>
+           <button
+               type="button"
+               onClick={() => setIsProfileOpen(!isProfileOpen)}
+               className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full p-2 text-[#123B5D] transition-colors hover:bg-[#EEF3F6] hover:text-[#F28C28] focus:outline-none"
+               aria-label="Open account menu"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-          </Link>
+             <FiUser className="h-5 w-5" />
+           </button>
+        {isProfileOpen && (
+          <div className="absolute right-0 top-12 z-50 w-56 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
+           <div className="border-b border-gray-100 px-3 py-2">
+              <p className="text-sm font-bold text-[#111111]">
+                Hi, {user.name}
+              </p>
+
+              <p className="truncate text-xs text-gray-500">
+                {user.email}
+              </p>
+             </div>
+
+               <Link
+               href="/account"
+               className="block rounded-lg px-3 py-2 text-sm font-semibold text-[#111111] transition hover:bg-[#EEF3F6] hover:text-[#123B5D]"
+               >
+               My Account
+               </Link>
+
+                 {user.role === 'ADMIN' && (
+               <Link
+                  href="/admin/dashboard"
+                  className="block rounded-lg px-3 py-2 text-sm font-semibold text-[#123B5D] transition hover:bg-[#EEF3F6] hover:text-[#F28C28]"
+                >
+                 Admin Dashboard
+               </Link>
+              )}
+
+              <button
+                 type="button"
+                 onClick={() => {
+                 logout();
+                 setIsProfileOpen(false);
+                 }}
+                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                >
+                <FiLogOut className="h-4 w-4" />
+                Logout
+               </button>
+             </div>
+        )}
+            </>
+           ) : (
+            <Link
+               href="/auth/login"
+              className="flex min-h-[38px] min-w-[38px] items-center justify-center gap-2 rounded-full p-2 text-[#123B5D] transition-colors hover:bg-[#EEF3F6] hover:text-[#F28C28] focus:outline-none"
+               aria-label="Login"
+             >
+            <FiUser className="h-5 w-5" />
+            <span className="hidden xl:inline">Login</span>
+            </Link>
+           )}
+          </div>
 
           {/* CTA Button */}
           <Link
@@ -184,7 +250,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 text-[#123B5D] hover:text-[#F28C28] hover:bg-[#EEF3F6] rounded transition-colors focus:outline-none ml-1 min-w-[42px] min-h-[42px] flex items-center justify-center"
+            className="lg:hidden p-2 text-[#123B5D] hover:text-[#F28C28] hover:bg-[#EEF3F6] rounded transition-colors focus:outline-none min-w-[42px] min-h-[42px] flex items-center justify-center"
             aria-label="Toggle Navigation Menu"
           >
             <svg
@@ -211,15 +277,21 @@ export default function Navbar() {
             </svg>
           </button>
         </div>
+       
       </div>
 
       {/* Search Input Bar */}
       {isSearchOpen && (
         <div className="bg-[#111111] border-t border-[#123B5D] px-3 sm:px-6 py-3 transition-all">
-          <div className="max-w-3xl mx-auto flex items-center gap-2">
+          <form
+            onSubmit={handleSearch}
+            className="max-w-3xl mx-auto flex items-center gap-2"
+            >
             <input
               type="text"
               placeholder="Search garments, uniforms, or bespoke suits..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-[#123B5D]/40 border border-[#123B5D] text-white placeholder-gray-400 text-sm rounded px-3 py-2 focus:outline-none focus:border-[#F28C28]"
               autoFocus
             />
@@ -231,25 +303,30 @@ export default function Navbar() {
             >
               Close
             </button>
+            </form>
           </div>
-        </div>
       )}
 
       {/* Mobile Drawer Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-[#111111] border-t border-[#123B5D] px-4 pt-4 pb-6 space-y-4 animate-in slide-in-from-top duration-200">
+        <div className="lg:hidden max-h-[calc(100dvh-8rem)] overflow-y-auto overscroll-contain bg-[#111111] border-t border-[#123B5D] px-4 pt-4 pb-6 space-y-4 animate-in slide-in-from-top duration-200">
           <nav className="flex flex-col space-y-2">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className="block text-base font-semibold text-[#EEF3F6] hover:text-[#F28C28] py-2 px-3 rounded hover:bg-[#123B5D]/30 transition-colors"
+                className={`block text-base font-semibold py-2 px-3 rounded transition-colors ${
+                  pathname === link.href
+                    ? 'text-[#F28C28] bg-[#123B5D]/30'
+                    : 'text-[#EEF3F6] hover:text-[#F28C28] hover:bg-[#123B5D]/30'
+                }`}
               >
                 {link.label}
               </Link>
             ))}
 
+            {/* Mobile Account */}
             <Link
               href="/account"
               onClick={() => setIsMenuOpen(false)}
@@ -265,7 +342,7 @@ export default function Navbar() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7-7 7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
 
@@ -284,10 +361,10 @@ export default function Navbar() {
 
             <div className="text-center pt-2">
               <a
-                href="tel:+250788000000"
+                href="tel:+250781070569"
                 className="text-xs text-[#EEF3F6]/80 hover:text-[#F28C28] block"
               >
-                Need help? Call: +250 788 000 000
+                Need help? Call: +250781070569
               </a>
             </div>
           </div>

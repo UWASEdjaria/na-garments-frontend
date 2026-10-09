@@ -28,22 +28,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10 pb-12 border-b border-gray-800">
           {/* Section 1: Brand */}
           <div className="sm:col-span-2 lg:col-span-2 space-y-4">
-            <Link href="/" className="flex items-center gap-2 group inline-block focus:outline-none">
-               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-md bg-[#123B5D] flex items-center justify-center overflow-hidden">
-                  <Image
-                   src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790879861/75affa54-fc00-4a9c-b196-ac0892d8f8d6.png"
-                   alt="NA-GARMENTS"
-                   width={50}
-                  height={50}
-                  className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
-                  />
-                 </div>
-              <span className="font-extrabold text-xl tracking-wider text-white uppercase group-hover:text-[#F28C28] transition-colors">
-                NA-GARMENTS
-              </span>
+            <Link href="/" className="inline-block focus:outline-none py-1">
+              <img
+                src="https://res.cloudinary.com/ziwgo9pj/image/upload/f_auto,q_auto,w_800/v1790878768/For_a_dark_background.png"
+                alt="nagarments"
+                className="h-16 sm:h-20 lg:h-24 w-auto object-contain object-left"
+                loading="eager"
+              />
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed max-w-sm">
-              NA-GARMENTS is Rwanda’s premier apparel manufacturer and bespoke tailoring studio. We produce tailored school uniforms, industrial workwear, and bespoke men’s fashion crafted for precision, fit, and endurance.
+              nagarments is Rwanda’s premier apparel manufacturer and bespoke tailoring studio. We produce tailored school uniforms, industrial workwear, and bespoke men’s fashion crafted for precision, fit, and endurance.
             </p>
             <div className="pt-2">
               <span className="inline-block text-xs font-semibold text-[#F28C28] uppercase tracking-widest bg-[#123B5D]/40 px-3 py-1 rounded border border-[#123B5D]">
@@ -140,17 +134,17 @@ export default function Footer() {
               <div className="flex items-center gap-2 flex-wrap">
                 {SOCIAL_LINKS.map((s) => (
                   <a
-                    key={s.name}
+                    key={s.platform}
                     href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={s.name}
+                    aria-label={s.platform}
                     className={`w-8 h-8 rounded-full text-white transition-all duration-200 flex items-center justify-center hover:scale-105 ${
-                    SOCIAL_COLORS[s.name as keyof typeof SOCIAL_COLORS]
+                    SOCIAL_COLORS[s.platform as keyof typeof SOCIAL_COLORS]
                   }`}
                   >
                     {(() => {
-                  const Icon = SOCIAL_ICONS[s.name as keyof typeof SOCIAL_ICONS];
+                  const Icon = SOCIAL_ICONS[s.platform as keyof typeof SOCIAL_ICONS];
                   return Icon ? <Icon className="w-4 h-4" /> : null;
                   })()}
                   </a>
@@ -162,7 +156,7 @@ export default function Footer() {
 
         {/* Section 7: Footer Bottom */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 text-center sm:text-left">
-          <p>© {new Date().getFullYear()} NA-GARMENTS. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} nagarments. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">
               Privacy Policy
