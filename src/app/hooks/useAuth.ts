@@ -32,7 +32,7 @@ export default function useAuth() {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
 
-    setUser(response.data.user);
+    setUser(null);
 
     return response;
   };
