@@ -1,372 +1,583 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useCartCount } from '../hooks/useCartCount';
-import { NAV_LINKS } from '../lib/constants';
-import Image from 'next/image';
-import { FiLogOut, FiUser } from 'react-icons/fi';
-import { useWishlistCount } from '../hooks/useWishlistCount';
+import { useState, type FormEvent } from 'react';
+import {
+  FiBell,
+  FiCheck,
+  FiChevronDown,
+  FiClipboard,
+  FiGrid,
+  FiHeadphones,
+  FiHome,
+  FiLogOut,
+  FiMail,
+  FiMenu,
+  FiPackage,
+  FiPhone,
+  FiSearch,
+  FiShoppingCart,
+  FiUser,
+  FiX,
+} from 'react-icons/fi';
+
 import useAuth from '../hooks/useAuth';
+import { useCartCount } from '../hooks/useCartCount';
+import { CONTACT_INFO } from '../lib/constants';
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+
   const cartCount = useCartCount();
-  const wishlistCount = useWishlistCount();
   const { user, isLoading, logout } = useAuth();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+  const isAdmin = user?.role === 'ADMIN';
+  const isAdminPage = pathname.startsWith('/admin');
+  const isCustomer = user?.role === 'CUSTOMER';
 
-  const query = searchQuery.trim();
+  const initials =
+    user?.name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join('') || 'U';
 
-  if (!query) return;
+  const publicLinks = [
+    { label: 'Home', href: '/' },
+    { label: 'Products', href: '/shop' },
+    { label: 'Custom Order', href: '/custom-order' },
+  ];
 
-  router.push(`/shop?search=${encodeURIComponent(query)}`);
-  setIsSearchOpen(false);
-};
+  const navigationLinks = isAdmin
+    ? isAdminPage
+      ? []
+      : [
+          { label: 'Home', href: '/' },
+          { label: 'Dashboard', href: '/admin/custom-orders' },
+        ]
+    : isCustomer
+      ? [...publicLinks, { label: 'Dashboard', href: '/account' }]
+      : publicLinks;
 
-  return (
-    <header className="sticky top-0 z-50 bg-white text-[#111111] shadow-md w-full overflow-x-hidden">
-      {/* Top Announcement Bar */}
-      <div className="bg-[#111111] text-[#EEF3F6] text-xs py-1.5 px-3 text-center border-b border-gray-800 flex items-center justify-between max-w-7xl mx-auto">
-        <span className="truncate">
-          Bespoke Tailoring & Apparel Manufacturing in Kigali, Rwanda
+  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const query = searchQuery.trim();
+
+    if (!query) return;
+
+    router.push(`/shop?search=${encodeURIComponent(query)}`);
+    setIsSearchOpen(false);
+    setSearchQuery('');
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsProfileOpen(false);
+    setIsMenuOpen(false);
+    router.replace('/auth/login');
+  };
+
+  const closeMobileMenu = () => {
+    setIsMenuOpen(false);
+    setIsProfileOpen(false);
+  };
+
+  const iconButtonClass =
+    'relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#123B5D] transition hover:bg-[#EEF3F6] hover:text-[#F28C28] focus-visible:outline-2 focus-visible:outline-[#F28C28]';
+
+  const profileLinkClass =
+    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#111111] transition hover:bg-[#EEF3F6] hover:text-[#123B5D]';
+
+  const renderProfileButton = () => (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsProfileOpen((open) => !open)}
+        aria-label="Open profile menu"
+        aria-expanded={isProfileOpen}
+        className="flex items-center gap-2 rounded-full p-1 transition hover:bg-[#EEF3F6] focus-visible:outline-2 focus-visible:outline-[#F28C28]"
+      >
+        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#123B5D] text-sm font-bold text-white ring-2 ring-[#EEF3F6]">
+          {initials}
         </span>
 
-        <div className="hidden sm:flex items-center gap-4 text-xs shrink-0">
-          <a
-            href="tel:+250781070569"
-            className="hover:text-[#F28C28] transition-colors"
-          >
-            +250781070569
-          </a>
+        <FiChevronDown
+          className={`hidden h-4 w-4 text-[#123B5D] transition sm:block ${
+            isProfileOpen ? 'rotate-180' : ''
+          }`}
+          aria-hidden="true"
+        />
+      </button>
 
-          <span>|</span>
-
-          <a
-            href="mailto:nagarmentss@gmail.com"
-            className="hover:text-[#F28C28] transition-colors"
-          >
-            nagarmentss@gmail.com
-          </a>
-        </div>
-      </div>
-
-      {/* Main Navigation Header */}
-      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 min-h-20 sm:min-h-24 py-2 flex items-center justify-between gap-1 sm:gap-6">
-        {/* Brand Logo */}
-        <Link
-        href="/"
-        className="flex items-center shrink-0 group focus:outline-none"
-        >
-        <div className="relative w-32 h-12 sm:w-60 sm:h-18 lg:h-20 flex items-center justify-center overflow-hidden">
-          <Image
-           src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790878768/For_a_white_background.png"
-            alt="nagarments"
-            width={361}
-            height={193}
-            className="w-full h-full object-contain"
-          />
-         </div>
-        </Link>
-
-        {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`text-sm font-semibold transition-colors tracking-wide py-2 ${
-                pathname === link.href
-                  ? 'text-[#F28C28]'
-                  : 'text-[#111111] hover:text-[#F28C28]'
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Header Utilities / Action Icons */}
-        <div className="flex items-center gap-0.5 sm:gap-3 shrink-0">
-          {/* Search Toggle */}
+      {isProfileOpen && (
+        <>
           <button
             type="button"
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
-            className="p-2 text-[#123B5D] hover:text-[#F28C28] hover:bg-[#EEF3F6] rounded-full transition-colors focus:outline-none min-w-[38px] min-h-[38px] flex items-center justify-center"
-            aria-label="Search site"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </button>
+            aria-label="Close profile menu"
+            className="fixed inset-0 z-40 cursor-default"
+            onClick={() => setIsProfileOpen(false)}
+          />
 
-          {/* Wishlist Link */}
-          <Link
-            href="/wishlist"
-            className="p-2 text-[#123B5D] hover:text-[#F28C28] hover:bg-[#EEF3F6] rounded-full transition-colors relative focus:outline-none min-w-[38px] min-h-[38px] flex items-center justify-center"
-            aria-label="Wishlist"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
+          <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-xl border border-gray-200 bg-white p-2 shadow-xl">
+            <div className="border-b border-gray-100 px-3 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                Signed in as
+              </p>
 
-          
-         <span className="absolute top-1 right-1 bg-[#F28C28] text-[#111111] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-         {wishlistCount}
-         </span>
-          </Link>
-
-          {/* Cart Link */}
-          <Link
-            href="/cart"
-            className="p-2 text-[#123B5D] hover:text-[#F28C28] hover:bg-[#EEF3F6] rounded-full transition-colors relative focus:outline-none min-w-[38px] min-h-[38px] flex items-center justify-center"
-            aria-label="Shopping Cart"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-              />
-            </svg>
-
-          <span className="absolute top-1 right-1 bg-[#F28C28] text-[#111111] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-             {cartCount}
-             </span>
-          </Link>
-
-         
-          {/* Account / Profile */}
-          <div className="relative hidden sm:block">
-                {isLoading ? (
-          <div className="h-[38px] w-[38px]" />
-                 ) : user ? (
-           <>
-           <button
-               type="button"
-               onClick={() => setIsProfileOpen(!isProfileOpen)}
-               className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full p-2 text-[#123B5D] transition-colors hover:bg-[#EEF3F6] hover:text-[#F28C28] focus:outline-none"
-               aria-label="Open account menu"
-            >
-             <FiUser className="h-5 w-5" />
-           </button>
-        {isProfileOpen && (
-          <div className="absolute right-0 top-12 z-50 w-56 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
-           <div className="border-b border-gray-100 px-3 py-2">
-              <p className="text-sm font-bold text-[#111111]">
-                Hi, {user.name}
+              <p className="mt-1 truncate text-sm font-bold text-[#123B5D]">
+                {user?.name}
               </p>
 
               <p className="truncate text-xs text-gray-500">
-                {user.email}
+                {user?.email}
               </p>
-             </div>
 
-               <Link
-               href="/account"
-               className="block rounded-lg px-3 py-2 text-sm font-semibold text-[#111111] transition hover:bg-[#EEF3F6] hover:text-[#123B5D]"
-               >
-               My Account
-               </Link>
-
-                 {user.role === 'ADMIN' && (
-               <Link
-                  href="/admin/dashboard"
-                  className="block rounded-lg px-3 py-2 text-sm font-semibold text-[#123B5D] transition hover:bg-[#EEF3F6] hover:text-[#F28C28]"
-                >
-                 Admin Dashboard
-               </Link>
+              {isAdmin && (
+                <span className="mt-2 inline-flex rounded-full bg-[#EEF3F6] px-2.5 py-1 text-xs font-semibold text-[#123B5D]">
+                  Administrator
+                </span>
               )}
+            </div>
 
-              <button
-                 type="button"
-                 onClick={() => {
-                 logout();
-                 setIsProfileOpen(false);
-                 }}
-                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
+            {isAdmin ? (
+              <>
+                <Link
+                  href="/admin/custom-orders"
+                  onClick={() => setIsProfileOpen(false)}
+                  className={profileLinkClass}
                 >
-                <FiLogOut className="h-4 w-4" />
-                Logout
-               </button>
-             </div>
-        )}
-            </>
-           ) : (
-            <Link
-               href="/auth/login"
-              className="flex min-h-[38px] min-w-[38px] items-center justify-center gap-2 rounded-full p-2 text-[#123B5D] transition-colors hover:bg-[#EEF3F6] hover:text-[#F28C28] focus:outline-none"
-               aria-label="Login"
-             >
-            <FiUser className="h-5 w-5" />
-            <span className="hidden xl:inline">Login</span>
-            </Link>
-           )}
-          </div>
+                  <FiGrid className="h-4 w-4" />
+                  Dashboard
+                </Link>
 
-          {/* CTA Button */}
-          <Link
-            href="/custom-order"
-            className="hidden xl:inline-flex bg-[#F28C28] text-[#111111] hover:bg-[#123B5D] hover:text-white font-bold text-xs uppercase tracking-wider px-3.5 py-2 rounded transition-all shrink-0 ml-1"
-          >
-            Custom Order
-          </Link>
+                <Link
+                  href="/account"
+                  onClick={() => setIsProfileOpen(false)}
+                  className={profileLinkClass}
+                >
+                  <FiUser className="h-4 w-4" />
+                  Profile
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/account"
+                  onClick={() => setIsProfileOpen(false)}
+                  className={profileLinkClass}
+                >
+                  <FiUser className="h-4 w-4" />
+                  Profile
+                </Link>
 
-          {/* Mobile Menu Toggle */}
-          <button
-            type="button"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 text-[#123B5D] hover:text-[#F28C28] hover:bg-[#EEF3F6] rounded transition-colors focus:outline-none min-w-[42px] min-h-[42px] flex items-center justify-center"
-            aria-label="Toggle Navigation Menu"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+                <Link
+                  href="/account"
+                  onClick={() => setIsProfileOpen(false)}
+                  className={profileLinkClass}
+                >
+                  <FiClipboard className="h-4 w-4" />
+                  Orders
+                </Link>
+
+                <a
+                  href={CONTACT_INFO.emailHref}
+                  onClick={() => setIsProfileOpen(false)}
+                  className={profileLinkClass}
+                >
+                  <FiHeadphones className="h-4 w-4" />
+                  Contact Support
+                </a>
+              </>
+            )}
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="mt-1 flex w-full items-center gap-3 rounded-lg border-t border-gray-100 px-3 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
             >
-              {isMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
+              <FiLogOut className="h-4 w-4" />
+              Logout
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+
+  return (
+    <header className="sticky top-0 z-50 w-full bg-white text-[#111111] shadow-md">
+      {/* Announcement bar */}
+      <div className="flex min-h-8 items-center justify-between gap-3 bg-[#111111] px-3 py-1.5 text-xs text-[#EEF3F6] sm:px-6 lg:px-8">
+        <p className="truncate">
+          Custom Tailoring & Quality Apparel in Kigali, Rwanda
+        </p>
+
+        <div className="hidden shrink-0 items-center gap-4 sm:flex">
+          <a
+            href={CONTACT_INFO.phoneHref}
+            className="transition-colors hover:text-[#F28C28]"
+          >
+            {CONTACT_INFO.phoneDisplay}
+          </a>
+
+          <span aria-hidden="true" className="text-gray-600">
+            |
+          </span>
+
+          <a
+            href={CONTACT_INFO.emailHref}
+            className="transition-colors hover:text-[#F28C28]"
+          >
+            {CONTACT_INFO.emailDisplay}
+          </a>
         </div>
-       
       </div>
 
-      {/* Search Input Bar */}
-      {isSearchOpen && (
-        <div className="bg-[#111111] border-t border-[#123B5D] px-3 sm:px-6 py-3 transition-all">
+      {/* Main navigation */}
+      <div className="mx-auto flex min-h-[64px] max-w-7xl items-center justify-between gap-3 px-3 py-1.5 sm:px-6 lg:min-h-[72px] lg:px-8">
+        {/* Logo */}
+        <Link
+          href="/"
+          aria-label="nagarments homepage"
+          className="flex shrink-0 items-center"
+          onClick={closeMobileMenu}
+        >
+          <div className="relative h-11 w-32 sm:h-14 sm:w-40 lg:h-16 lg:w-48">
+            <Image
+              src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790878768/For_a_white_background.png"
+              alt="nagarments"
+              fill
+              priority
+              sizes="(max-width: 640px) 128px, (max-width: 1024px) 160px, 192px"
+              className="object-contain"
+            />
+          </div>
+        </Link>
+
+        {/* Desktop navigation */}
+        {!isLoading && (
+          <nav
+            aria-label="Main navigation"
+            className="hidden items-center gap-5 lg:flex xl:gap-7"
+          >
+            {navigationLinks.map((link) => {
+              const isActive =
+                pathname === link.href ||
+                (link.href !== '/' && pathname.startsWith(`${link.href}/`));
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative whitespace-nowrap py-2 text-sm font-semibold transition-colors ${
+                    isActive
+                      ? 'text-[#F28C28]'
+                      : 'text-[#111111] hover:text-[#F28C28]'
+                  }`}
+                >
+                  {link.label}
+
+                  {isActive && (
+                    <span className="absolute inset-x-0 -bottom-1 h-0.5 rounded-full bg-[#F28C28]" />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
+
+        {/* Right-side actions */}
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          {/* Admin notifications */}
+          {!isLoading && isAdmin && isAdminPage && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() =>
+                  setIsNotificationsOpen((open) => !open)
+                }
+                aria-label="Open notifications"
+                aria-expanded={isNotificationsOpen}
+                className={iconButtonClass}
+              >
+                <FiBell className="h-5 w-5" />
+              </button>
+
+              {isNotificationsOpen && (
+                <>
+                  <button
+                    type="button"
+                    aria-label="Close notifications"
+                    className="fixed inset-0 z-40 cursor-default"
+                    onClick={() => setIsNotificationsOpen(false)}
+                  />
+
+                  <div className="absolute right-0 top-12 z-50 w-72 rounded-xl border border-gray-200 bg-white p-4 shadow-xl sm:w-80">
+                    <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
+                      <FiBell className="h-5 w-5 text-[#123B5D]" />
+
+                      <h2 className="font-bold text-[#123B5D]">
+                        Notifications
+                      </h2>
+                    </div>
+
+                    <div className="py-6 text-center">
+                      <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#EEF3F6] text-[#123B5D]">
+                        <FiCheck className="h-5 w-5" />
+                      </span>
+
+                      <p className="mt-3 text-sm font-semibold text-[#111111]">
+                        No notifications to display
+                      </p>
+
+                      <p className="mt-1 text-xs leading-5 text-gray-500">
+                        Stock alerts, new orders, and new messages will appear
+                        here when notification data is connected.
+                      </p>
+                    </div>
+
+                    <Link
+                      href="/admin/custom-orders"
+                      onClick={() => setIsNotificationsOpen(false)}
+                      className="block rounded-lg bg-[#EEF3F6] px-3 py-2 text-center text-sm font-semibold text-[#123B5D] transition hover:bg-[#123B5D] hover:text-white"
+                    >
+                      View custom orders
+                    </Link>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Search, contact and cart */}
+          {!isAdminPage && (
+            <>
+              <button
+                type="button"
+                onClick={() => setIsSearchOpen((open) => !open)}
+                aria-label={isSearchOpen ? 'Close search' : 'Search products'}
+                aria-expanded={isSearchOpen}
+                className={iconButtonClass}
+              >
+                {isSearchOpen ? (
+                  <FiX className="h-5 w-5" />
+                ) : (
+                  <FiSearch className="h-5 w-5" />
+                )}
+              </button>
+
+              {!isLoading && !isAdmin && (
+                <Link
+                  href="/contact"
+                  aria-label="Contact nagarments"
+                  title="Contact us"
+                  className={`${iconButtonClass} hidden sm:inline-flex`}
+                >
+                  <FiPhone className="h-5 w-5" />
+                </Link>
+              )}
+
+              {!isLoading && !isAdmin && (
+                <Link
+                  href="/cart"
+                  aria-label={`Shopping cart, ${cartCount} items`}
+                  className={iconButtonClass}
+                >
+                  <FiShoppingCart className="h-5 w-5" />
+
+                  <span className="absolute right-0 top-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#F28C28] px-1 text-[10px] font-bold text-[#111111]">
+                    {cartCount}
+                  </span>
+                </Link>
+              )}
+            </>
+          )}
+
+          {/* Guest actions */}
+          {!isLoading && !user && (
+            <div className="hidden items-center gap-2 sm:flex">
+              <Link
+                href="/auth/login"
+                className="rounded-lg px-3 py-2 text-sm font-semibold text-[#123B5D] transition hover:bg-[#EEF3F6] hover:text-[#F28C28]"
+              >
+                Login
+              </Link>
+
+              <Link
+                href="/auth/register"
+                className="rounded-lg bg-[#123B5D] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#F28C28] hover:text-[#111111]"
+              >
+                Register
+              </Link>
+            </div>
+          )}
+
+          {/* Customer and admin profiles */}
+          {!isLoading && user && renderProfileButton()}
+
+          {/* Mobile menu button */}
+          {!isAdminPage && (
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen((open) => !open)}
+              aria-label={
+                isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'
+              }
+              aria-expanded={isMenuOpen}
+              className={`${iconButtonClass} lg:hidden`}
+            >
+              {isMenuOpen ? (
+                <FiX className="h-6 w-6" />
+              ) : (
+                <FiMenu className="h-6 w-6" />
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Search panel */}
+      {isSearchOpen && !isAdminPage && (
+        <div className="border-t border-[#123B5D] bg-[#111111] px-3 py-4 sm:px-6">
           <form
             onSubmit={handleSearch}
-            className="max-w-3xl mx-auto flex items-center gap-2"
-            >
+            className="mx-auto flex max-w-3xl items-center gap-2"
+          >
+            <FiSearch
+              aria-hidden="true"
+              className="h-5 w-5 shrink-0 text-[#F28C28]"
+            />
+
             <input
-              type="text"
-              placeholder="Search garments, uniforms, or bespoke suits..."
+              type="search"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#123B5D]/40 border border-[#123B5D] text-white placeholder-gray-400 text-sm rounded px-3 py-2 focus:outline-none focus:border-[#F28C28]"
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search garments and uniforms..."
+              aria-label="Search products"
+              className="w-full rounded-lg border border-[#123B5D] bg-[#123B5D]/30 px-3 py-2.5 text-sm text-white placeholder-gray-400 outline-none focus:border-[#F28C28]"
               autoFocus
             />
 
             <button
-              type="button"
-              onClick={() => setIsSearchOpen(false)}
-              className="text-xs text-[#EEF3F6] hover:text-[#F28C28] px-3 py-2 shrink-0"
+              type="submit"
+              className="rounded-lg bg-[#F28C28] px-4 py-2.5 text-sm font-bold text-[#111111] transition hover:bg-white"
             >
-              Close
+              Search
             </button>
-            </form>
-          </div>
+          </form>
+        </div>
       )}
 
-      {/* Mobile Drawer Menu */}
-      {isMenuOpen && (
-        <div className="lg:hidden max-h-[calc(100dvh-8rem)] overflow-y-auto overscroll-contain bg-[#111111] border-t border-[#123B5D] px-4 pt-4 pb-6 space-y-4 animate-in slide-in-from-top duration-200">
-          <nav className="flex flex-col space-y-2">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsMenuOpen(false)}
-                className={`block text-base font-semibold py-2 px-3 rounded transition-colors ${
-                  pathname === link.href
-                    ? 'text-[#F28C28] bg-[#123B5D]/30'
-                    : 'text-[#EEF3F6] hover:text-[#F28C28] hover:bg-[#123B5D]/30'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+      {/* Mobile navigation */}
+      {isMenuOpen && !isAdminPage && (
+        <div className="max-h-[calc(100dvh-6rem)] overflow-y-auto border-t border-[#123B5D] bg-[#111111] px-4 py-4 lg:hidden">
+          <nav aria-label="Mobile navigation" className="space-y-1">
+            {navigationLinks.map((link) => {
+              const isActive =
+                pathname === link.href ||
+                (link.href !== '/' && pathname.startsWith(`${link.href}/`));
 
-            {/* Mobile Account */}
-            <Link
-              href="/account"
-              onClick={() => setIsMenuOpen(false)}
-              className="flex items-center gap-2 text-base font-semibold text-[#EEF3F6] hover:text-[#F28C28] py-2 px-3 rounded hover:bg-[#123B5D]/30 transition-colors"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMobileMenu}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold transition ${
+                    isActive
+                      ? 'bg-[#123B5D]/40 text-[#F28C28]'
+                      : 'text-[#EEF3F6] hover:bg-[#123B5D]/30 hover:text-[#F28C28]'
+                  }`}
+                >
+                  {link.href === '/' ? (
+                    <FiHome className="h-5 w-5" />
+                  ) : link.href === '/shop' ? (
+                    <FiPackage className="h-5 w-5" />
+                  ) : link.href === '/custom-order' ? (
+                    <FiClipboard className="h-5 w-5" />
+                  ) : (
+                    <FiGrid className="h-5 w-5" />
+                  )}
 
-              My Account / Login
-            </Link>
+                  {link.label}
+                </Link>
+              );
+            })}
+
+            {!isLoading && user && (
+              <>
+                <Link
+                  href="/account"
+                  onClick={closeMobileMenu}
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold text-[#EEF3F6] transition hover:bg-[#123B5D]/30 hover:text-[#F28C28]"
+                >
+                  <FiUser className="h-5 w-5" />
+                  Profile
+                </Link>
+
+                {isCustomer && (
+                  <a
+                    href={CONTACT_INFO.emailHref}
+                    onClick={closeMobileMenu}
+                    className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold text-[#EEF3F6] transition hover:bg-[#123B5D]/30 hover:text-[#F28C28]"
+                  >
+                    <FiMail className="h-5 w-5" />
+                    Contact Support
+                  </a>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-semibold text-red-400 transition hover:bg-red-500/10"
+                >
+                  <FiLogOut className="h-5 w-5" />
+                  Logout
+                </button>
+              </>
+            )}
+
+            {!isLoading && !user && (
+              <>
+                <Link
+                  href="/auth/login"
+                  onClick={closeMobileMenu}
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold text-[#EEF3F6] transition hover:bg-[#123B5D]/30 hover:text-[#F28C28]"
+                >
+                  <FiUser className="h-5 w-5" />
+                  Login
+                </Link>
+
+                <Link
+                  href="/auth/register"
+                  onClick={closeMobileMenu}
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold text-[#EEF3F6] transition hover:bg-[#123B5D]/30 hover:text-[#F28C28]"
+                >
+                  <FiUser className="h-5 w-5" />
+                  Register
+                </Link>
+              </>
+            )}
           </nav>
 
-          <div className="pt-2 border-t border-gray-800 flex flex-col gap-2">
-            <Link
-              href="/custom-order"
-              onClick={() => setIsMenuOpen(false)}
-              className="w-full text-center bg-[#F28C28] text-[#111111] font-bold text-sm uppercase tracking-wider py-3 rounded hover:bg-white hover:text-[#123B5D] transition-colors"
+          <div className="mt-4 space-y-3 border-t border-gray-800 pt-4">
+            <a
+              href={CONTACT_INFO.phoneHref}
+              className="flex items-center justify-center gap-2 py-2 text-xs text-[#EEF3F6]/80 transition hover:text-[#F28C28]"
             >
-              Start Custom Order
-            </Link>
-
-            <div className="text-center pt-2">
-              <a
-                href="tel:+250781070569"
-                className="text-xs text-[#EEF3F6]/80 hover:text-[#F28C28] block"
-              >
-                Need help? Call: +250781070569
-              </a>
-            </div>
+              <FiPhone className="h-4 w-4" />
+              Need help? {CONTACT_INFO.phoneDisplay}
+            </a>
           </div>
         </div>
       )}

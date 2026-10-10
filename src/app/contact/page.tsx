@@ -1,11 +1,16 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import ContactForm from '@/app/components/ContactForm';
 import Navbar from '@/app/components/Navbar';
-import Footer from '@/app/components/Footer';
-import CustomOrderForm from '../components/CustomOrderForm';
 
-export default function CustomOrderPage() {
+export const metadata: Metadata = {
+  title: 'Contact',
+  description: 'Contact the nagarments tailoring atelier in Kigali, Rwanda.',
+};
+
+export default function ContactPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[#EEF3F6] text-[#111111]">
       <Navbar />
@@ -15,7 +20,7 @@ export default function CustomOrderPage() {
           <div className="grid w-full flex-1 overflow-hidden rounded-2xl bg-white shadow-xl lg:min-h-[calc(100vh-150px)] lg:grid-cols-2">
             <section className="flex items-center justify-center px-3 py-4 sm:px-5 sm:py-6 lg:px-8 lg:py-8">
               <div className="w-full max-w-xl">
-                <CustomOrderForm />
+                <ContactForm />
 
                 <div className="mt-3 text-center">
                   <Link
@@ -47,11 +52,11 @@ export default function CustomOrderPage() {
                     nagarments
                   </p>
                   <h2 className="text-2xl font-extrabold leading-tight sm:text-3xl lg:text-4xl">
-                    Crafted to Fit. Made with Care.
+                    Made in Kigali. Made for You.
                   </h2>
                   <p className="mt-2 max-w-md text-sm leading-relaxed text-[#EEF3F6]/90 sm:text-base">
-                    Tell us what you need, and our Kigali team will review your
-                    request and get back to you with a quote.
+                    Talk with our atelier about custom tailoring, quality
+                    apparel, and your next order.
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     <span className="rounded bg-white/10 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
@@ -70,8 +75,6 @@ export default function CustomOrderPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }
