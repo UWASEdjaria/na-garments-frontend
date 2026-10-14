@@ -7,8 +7,8 @@ export const customOrderService = {
     const response = await api.post('/custom-orders', {
       ...data,
       quantity: Number(data.quantity),
+      ...(data.productId ? { productId: data.productId } : {}),
     });
-
     return response.data;
   },
 };

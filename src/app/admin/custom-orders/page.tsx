@@ -1,13 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
 
-import Navbar from '@/app/components/Navbar';
+import CustomOrderDetailModal from '@/app/components/admin/custom-orders/CustomOrderDetailModal';
 import CustomOrderTable from '@/app/components/admin/custom-orders/CustomOrderTable';
 import useAdminCustomOrders from '@/app/hooks/useAdminCustomOrders';
 
 export default function AdminCustomOrdersPage() {
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const {
     orders,
     isLoading,
@@ -16,11 +18,7 @@ export default function AdminCustomOrdersPage() {
   } = useAdminCustomOrders();
 
   return (
-    <div className="min-h-screen w-full bg-[#EEF3F6] text-[#111111] antialiased">
-      <Navbar />
-
-      <main className="w-full px-3 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
-        <div className="mx-auto w-full max-w-7xl">
+    <>
           {/* Header */}
           <section className="mb-6 sm:mb-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -76,10 +74,14 @@ export default function AdminCustomOrdersPage() {
               </p>
             </div>
           ) : (
-            <CustomOrderTable orders={orders} />
+            <CustomOrderTable orders={orders} onView={setSelectedOrderId} />
           )}
-        </div>
-      </main>
-    </div>
+          {selectedOrderId && (
+            <CustomOrderDetailModal
+              orderId={selectedOrderId}
+              onClose={() => setSelectedOrderId(null)}
+            />
+          )}
+    </>
   );
 }

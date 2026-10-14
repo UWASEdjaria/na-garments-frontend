@@ -13,6 +13,7 @@ import { FiHeart } from 'react-icons/fi';
 import { wishlistService } from '@/app/services/wishlist.service';
 import FadeIn from '../components/animations/FadeIn';
 import SlideUp from '../components/animations/SlideUp';
+import { useCurrency } from '@/app/components/CurrencyProvider';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'name';
 
@@ -33,6 +34,7 @@ function ShopContent() {
   
   const [wishlistProductIds, setWishlistProductIds] = useState<string[]>([]);
   const [wishlistLoadingId, setWishlistLoadingId] = useState<string | null>(null);
+  const { format } = useCurrency();
   const loadData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -333,15 +335,13 @@ function ShopContent() {
                 {paginatedProducts.map((product: Product) => {
                   const imageUrl = productService.getPrimaryImageUrl(product);
                   const isOutOfStock = !product.isAvailable || product.stockQuantity <= 0;
-                  const formattedPrice = Number(product.price).toLocaleString();
 
                   return (
                     <div
                       key={product.id}
                       className="bg-white rounded-xl border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-md hover:border-[#123B5D]/30 transition-all duration-200 flex flex-col group min-w-0"
                     >
-                      {/* Image Preview Container */}
-                 {/* Product Image Container - Full Image (No Cropping) */}
+                      {/* Product Image Container */}
                  <div className="relative aspect-square w-full bg-[#F8FAFC] p-3 overflow-hidden flex items-center justify-center border-b border-gray-100"> 
                     {imageUrl && imageUrl !== '/images/placeholder-garment.jpg' ? (
                   <Image
@@ -359,7 +359,6 @@ function ShopContent() {
                 </div>
                 
                    )}
-
 
                  {/* Wishlist Button */}
                    <button
@@ -379,6 +378,13 @@ function ShopContent() {
                      >
                      <FiHeart className="w-5 h-5" />
                     </button>
+
+                    {/* Made to Order badge */}
+                    {product.productType === 'MADE_TO_ORDER' && (
+                      <span className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 rounded-full bg-[#F28C28] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#111111]">
+                        Made to Order
+                      </span>
+                    )}
                    </div>
 
                       {/* Card Content */}
@@ -396,40 +402,60 @@ function ShopContent() {
                            <p className="text-xs text-gray-500 line-clamp-1 leading-relaxed min-h-[2.5rem] [overflow-wrap:anywhere]">                          
                             {product.description || 'Custom tailored garment crafted with premium materials.'}
                           </p>
-
-                         
                         </div>
 
                         {/* Pricing & Actions */}
                         <div className="pt-1 border-t border-gray-100 space-y-1">
-                          <div className="flex flex-col min-[380px]:flex-row min-[380px]:items-baseline justify-between gap-1.5 min-w-0">
-                            <span className="font-black text-sm sm:text-base text-[#123B5D] tracking-tight [overflow-wrap:anywhere]">
-                              {formattedPrice} <span className="text-xs font-bold text-gray-500">RWF</span>
-                            </span>
-                          </div>
-
-                          <div className="grid grid-cols-1 min-[640px]:grid-cols-2 gap-2">
-                            <Link
-                              href={`/shop/${product.id}`}
-                              className="w-full min-w-0 bg-[#EEF3F6] text-[#123B5D] hover:bg-[#123B5D] hover:text-white font-bold text-xs leading-tight px-2 py-2.5 rounded-lg text-center transition-all flex items-center justify-center min-h-[30px] break-words"
-                            >
-                              View Details
-                            </Link>
-                            
-                            <button
-                              onClick={() => handleAddToCart(product)}
-                              disabled={isOutOfStock}
-                              className={`w-full min-w-0 font-bold text-xs leading-tight px-2 py-2.5 rounded-lg transition-all flex items-center justify-center min-h-[30px] break-words ${
-                                isOutOfStock
-                                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                  : addedProductId === product.id
-                                  ? 'bg-green-600 text-white'
-                                  : 'bg-[#F28C28] text-[#111111] hover:bg-[#123B5D] hover:text-white shadow-sm'
-                              }`}
-                            >
-                              {addedProductId === product.id ? '✓ Added' : 'Add to Cart'}
-                            </button>
-                          </div>
+                          {product.productType === 'MADE_TO_ORDER' ? (
+                            <>
+                              <p className="text-xs text-gray-500 leading-relaxed">
+                                Price depends on your requirements.
+                              </p>
+                              <div className="grid grid-cols-1 min-[640px]:grid-cols-2 gap-2">
+                                <Link
+                                  href={`/shop/${product.id}`}
+                                  className="w-full min-w-0 bg-[#EEF3F6] text-[#123B5D] hover:bg-[#123B5D] hover:text-white font-bold text-xs leading-tight px-2 py-2.5 rounded-lg text-center transition-all flex items-center justify-center min-h-[30px]"
+                                >
+                                  View Details
+                                </Link>
+                                <Link
+                                  href={`/custom-order?productId=${product.id}&garmentType=${encodeURIComponent(product.name)}`}
+                                  className="w-full min-w-0 bg-[#F28C28] text-[#111111] hover:bg-[#123B5D] hover:text-white font-bold text-xs leading-tight px-2 py-2.5 rounded-lg text-center transition-all flex items-center justify-center min-h-[30px]"
+                                >
+                                  Request a Quote
+                                </Link>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex flex-col min-[380px]:flex-row min-[380px]:items-baseline justify-between gap-1.5 min-w-0">
+                                <span className="font-black text-sm sm:text-base text-[#123B5D] tracking-tight [overflow-wrap:anywhere]">
+                                  {format(Number(product.price))} <span className="text-xs font-bold text-gray-500">RWF</span>
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-1 min-[640px]:grid-cols-2 gap-2">
+                                <Link
+                                  href={`/shop/${product.id}`}
+                                  className="w-full min-w-0 bg-[#EEF3F6] text-[#123B5D] hover:bg-[#123B5D] hover:text-white font-bold text-xs leading-tight px-2 py-2.5 rounded-lg text-center transition-all flex items-center justify-center min-h-[30px] break-words"
+                                >
+                                  View Details
+                                </Link>
+                                <button
+                                  onClick={() => handleAddToCart(product)}
+                                  disabled={isOutOfStock}
+                                  className={`w-full min-w-0 font-bold text-xs leading-tight px-2 py-2.5 rounded-lg transition-all flex items-center justify-center min-h-[30px] break-words ${
+                                    isOutOfStock
+                                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                      : addedProductId === product.id
+                                      ? 'bg-green-600 text-white'
+                                      : 'bg-[#F28C28] text-[#111111] hover:bg-[#123B5D] hover:text-white shadow-sm'
+                                  }`}
+                                >
+                                  {addedProductId === product.id ? '✓ Added' : 'Add to Cart'}
+                                </button>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>

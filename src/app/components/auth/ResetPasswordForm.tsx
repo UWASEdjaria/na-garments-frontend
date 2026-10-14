@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiArrowRight, FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
 import { z } from 'zod';
@@ -22,6 +22,12 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 const [isSubmitting, setIsSubmitting] = useState(false);
 const [successMessage, setSuccessMessage] = useState('');
 const [errorMessage, setErrorMessage] = useState('');
+
+useEffect(() => {
+  if (!successMessage) return;
+  const timeoutId = window.setTimeout(() => setSuccessMessage(''), 4000);
+  return () => window.clearTimeout(timeoutId);
+}, [successMessage]);
 
 const {
 register,

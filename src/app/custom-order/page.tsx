@@ -1,11 +1,19 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
 import CustomOrderForm from '../components/CustomOrderForm';
 
-export default function CustomOrderPage() {
+function CustomOrderContent() {
+  const searchParams = useSearchParams();
+  const productId = searchParams.get('productId') ?? undefined;
+  const garmentType = searchParams.get('garmentType') ?? undefined;
+
   return (
     <div className="flex min-h-screen flex-col bg-[#EEF3F6] text-[#111111]">
       <Navbar />
@@ -15,7 +23,24 @@ export default function CustomOrderPage() {
           <div className="grid w-full flex-1 overflow-hidden rounded-2xl bg-white shadow-xl lg:min-h-[calc(100vh-150px)] lg:grid-cols-2">
             <section className="flex items-center justify-center px-3 py-4 sm:px-5 sm:py-6 lg:px-8 lg:py-8">
               <div className="w-full max-w-xl">
-                <CustomOrderForm />
+                {garmentType && (
+                  <div className="mb-5 rounded-xl border border-[#F28C28]/30 bg-[#F28C28]/10 px-4 py-3">
+                    <p className="text-xs font-bold uppercase tracking-wider text-[#F28C28]">
+                      Made to Order Request
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-[#111111]">
+                      {garmentType}
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      The form below is pre-filled with this design. You can adjust any details before submitting.
+                    </p>
+                  </div>
+                )}
+
+                <CustomOrderForm
+                  initialProductId={productId}
+                  initialGarmentType={garmentType}
+                />
 
                 <div className="mt-3 text-center">
                   <Link
@@ -73,5 +98,13 @@ export default function CustomOrderPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function CustomOrderPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#EEF3F6]" />}>
+      <CustomOrderContent />
+    </Suspense>
   );
 }

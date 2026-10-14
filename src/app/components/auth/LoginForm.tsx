@@ -9,6 +9,8 @@ import { FiArrowRight, FiEye, FiEyeOff, FiLock, FiMail } from 'react-icons/fi';
 import { z } from 'zod';
 
 import useAuth from '@/app/hooks/useAuth';
+import { getApiErrorMessage } from '@/app/lib/api-error';
+import { useToast } from '@/app/components/ToastProvider';
 import { loginSchema } from '@/app/lib/validations/auth.schema';
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -16,6 +18,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
+  const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -40,15 +43,28 @@ export default function LoginForm() {
       const successMessage = `Welcome back, ${response.data.user.name}! You have successfully signed in.`;
 
       sessionStorage.setItem('loginSuccess', successMessage);
+      showToast({
+        type: 'success',
+        title: 'Login successful',
+        description: successMessage,
+      });
 
-     if (response.data.user.role === 'ADMIN') {
-      router.push('/admin/dashboard');
-    } else {
-      router.push('/');
-    }
+      if (response.data.user.role === 'ADMIN') {
+        router.push('/admin/custom-orders');
+      } else {
+        router.push('/');
+      }
     } catch (error) {
-      console.error('Login failed:', error);
-      setErrorMessage('Invalid email or password.');
+      const message = getApiErrorMessage(
+        error instanceof Error ? error : new Error('Unable to sign in.'),
+        'Invalid email or password.'
+      );
+      setErrorMessage(message);
+      showToast({
+        type: 'error',
+        title: 'Login failed',
+        description: message,
+      });
     }
   };
 

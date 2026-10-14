@@ -64,8 +64,8 @@ export default function HomePage() {
               <FadeIn delay={0.2}>
                 <p className="mx-auto max-w-xl break-words text-xs leading-relaxed text-[#EEF3F6]/90 sm:mx-0 sm:text-sm md:text-base">
                   We make practical, well-fitted clothing for schools, workplaces,
-                  businesses, and everyday wear, with options for both ready-made
-                  and made-to-measure orders in Kigali.
+                  businesses, and everyday wear. Browse our designs and request a
+                  quote for a garment made to your needs in Kigali.
                 </p>
               </FadeIn>
 
@@ -165,12 +165,11 @@ export default function HomePage() {
               </span>
 
               <h2 className="break-words text-xl font-extrabold tracking-tight text-[#123B5D] sm:text-2xl md:text-3xl lg:text-4xl">
-                Shop by Clothing Type
+                Explore Our Garment Collection
               </h2>
 
               <p className="mt-2 text-xs leading-relaxed text-gray-600 sm:text-sm">
-                Browse clothing for school, work, business, and everyday use,
-                all in one place.
+                Browse garment designs for school, work, business, and everyday wear. Choose a design to request a quote for a garment made to your needs.
               </p>
             </div>
           </SlideUp>
@@ -188,7 +187,7 @@ export default function HomePage() {
                 </span>
 
                 <h2 className="break-words text-xl font-extrabold tracking-tight text-[#123B5D] sm:text-2xl md:text-3xl lg:text-4xl">
-                  Browse Popular Garments
+                  Featured Garment Designs
                 </h2>
               </div>
 

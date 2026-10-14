@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import {
   FiBell,
   FiCheck,
@@ -26,6 +26,10 @@ import {
 import useAuth from '../hooks/useAuth';
 import { useCartCount } from '../hooks/useCartCount';
 import { CONTACT_INFO } from '../lib/constants';
+import { notificationService } from '../services/notification.service';
+import type { AdminNotification } from '../types/notification';
+import { useToast } from './ToastProvider';
+import CurrencySelector from './CurrencySelector';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -39,6 +43,9 @@ export default function Navbar() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
+  const { showToast } = useToast();
 
   const isAdmin = user?.role === 'ADMIN';
   const isAdminPage = pathname.startsWith('/admin');
@@ -91,6 +98,60 @@ export default function Navbar() {
   const closeMobileMenu = () => {
     setIsMenuOpen(false);
     setIsProfileOpen(false);
+  };
+
+  const fetchUnreadCount = useCallback(async () => {
+    if (!isAdmin || !isAdminPage) return;
+
+    try {
+      const response = await notificationService.getUnreadCount();
+      setNotificationCount(response.count);
+    } catch (error) {
+      console.error('Unable to load notifications count', error);
+    }
+  }, [isAdmin, isAdminPage]);
+
+  const fetchNotifications = useCallback(async () => {
+    if (!isAdmin || !isAdminPage) return;
+
+    try {
+      const response = await notificationService.getNotifications();
+      setNotifications(response);
+      setNotificationCount(response.filter((item) => !item.isRead).length);
+    } catch (error) {
+      console.error('Unable to load notifications', error);
+      showToast({
+        type: 'error',
+        title: 'Notifications unavailable',
+        description: 'We could not load the latest admin notifications.',
+      });
+    }
+  }, [isAdmin, isAdminPage, showToast]);
+
+  useEffect(() => {
+    void fetchUnreadCount();
+  }, [fetchUnreadCount]);
+
+  useEffect(() => {
+    if (!isNotificationsOpen) return;
+    void fetchNotifications();
+  }, [fetchNotifications, isNotificationsOpen]);
+
+  const handleNotificationClick = async (id: string) => {
+    try {
+      await notificationService.markAsRead(id);
+      setNotifications((current) =>
+        current.map((item) => (item.id === id ? { ...item, isRead: true } : item))
+      );
+      setNotificationCount((current) => Math.max(current - 1, 0));
+    } catch (error) {
+      console.error('Unable to mark notification as read', error);
+      showToast({
+        type: 'error',
+        title: 'Notification update failed',
+        description: 'The notification could not be marked as read.',
+      });
+    }
   };
 
   const iconButtonClass =
@@ -182,7 +243,7 @@ export default function Navbar() {
                 </Link>
 
                 <Link
-                  href="/account"
+                  href="/account/orders"
                   onClick={() => setIsProfileOpen(false)}
                   className={profileLinkClass}
                 >
@@ -223,24 +284,27 @@ export default function Navbar() {
           Custom Tailoring & Quality Apparel in Kigali, Rwanda
         </p>
 
-        <div className="hidden shrink-0 items-center gap-4 sm:flex">
-          <a
-            href={CONTACT_INFO.phoneHref}
-            className="transition-colors hover:text-[#F28C28]"
-          >
-            {CONTACT_INFO.phoneDisplay}
-          </a>
+        <div className="flex shrink-0 items-center gap-3 sm:gap-4">
+          <CurrencySelector />
+          <div className="hidden items-center gap-4 sm:flex">
+            <a
+              href={CONTACT_INFO.phoneHref}
+              className="transition-colors hover:text-[#F28C28]"
+            >
+              {CONTACT_INFO.phoneDisplay}
+            </a>
 
-          <span aria-hidden="true" className="text-gray-600">
-            |
-          </span>
+            <span aria-hidden="true" className="text-gray-600">
+              |
+            </span>
 
-          <a
-            href={CONTACT_INFO.emailHref}
-            className="transition-colors hover:text-[#F28C28]"
-          >
-            {CONTACT_INFO.emailDisplay}
-          </a>
+            <a
+              href={CONTACT_INFO.emailHref}
+              className="transition-colors hover:text-[#F28C28]"
+            >
+              {CONTACT_INFO.emailDisplay}
+            </a>
+          </div>
         </div>
       </div>
 
@@ -304,14 +368,18 @@ export default function Navbar() {
             <div className="relative">
               <button
                 type="button"
-                onClick={() =>
-                  setIsNotificationsOpen((open) => !open)
-                }
+                onClick={() => setIsNotificationsOpen((open) => !open)}
                 aria-label="Open notifications"
                 aria-expanded={isNotificationsOpen}
                 className={iconButtonClass}
               >
                 <FiBell className="h-5 w-5" />
+
+                {notificationCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F28C28] px-1 text-[10px] font-bold text-[#111111]">
+                    {notificationCount > 99 ? '99+' : notificationCount}
+                  </span>
+                )}
               </button>
 
               {isNotificationsOpen && (
@@ -324,33 +392,88 @@ export default function Navbar() {
                   />
 
                   <div className="absolute right-0 top-12 z-50 w-72 rounded-xl border border-gray-200 bg-white p-4 shadow-xl sm:w-80">
-                    <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                      <FiBell className="h-5 w-5 text-[#123B5D]" />
+                    <div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-3">
+                      <div className="flex items-center gap-2">
+                        <FiBell className="h-5 w-5 text-[#123B5D]" />
+                        <h2 className="font-bold text-[#123B5D]">Notifications</h2>
+                      </div>
 
-                      <h2 className="font-bold text-[#123B5D]">
-                        Notifications
-                      </h2>
+                      {notificationCount > 0 && (
+                        <button
+                          type="button"
+                          className="text-[11px] font-semibold text-[#123B5D] transition hover:text-[#F28C28]"
+                          onClick={async () => {
+                            try {
+                              await notificationService.markAllAsRead();
+                              setNotifications((current) => current.map((item) => ({ ...item, isRead: true })));
+                              setNotificationCount(0);
+                            } catch (error) {
+                              console.error('Unable to clear notifications', error);
+                              showToast({
+                                type: 'error',
+                                title: 'Unable to clear notifications',
+                                description: 'Please try again in a moment.',
+                              });
+                            }
+                          }}
+                        >
+                          Mark all read
+                        </button>
+                      )}
                     </div>
 
-                    <div className="py-6 text-center">
-                      <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#EEF3F6] text-[#123B5D]">
-                        <FiCheck className="h-5 w-5" />
-                      </span>
+                    <div className="mt-3 max-h-80 space-y-2 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="py-6 text-center">
+                          <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#EEF3F6] text-[#123B5D]">
+                            <FiCheck className="h-5 w-5" />
+                          </span>
 
-                      <p className="mt-3 text-sm font-semibold text-[#111111]">
-                        No notifications to display
-                      </p>
+                          <p className="mt-3 text-sm font-semibold text-[#111111]">
+                            No notifications to display
+                          </p>
 
-                      <p className="mt-1 text-xs leading-5 text-gray-500">
-                        Stock alerts, new orders, and new messages will appear
-                        here when notification data is connected.
-                      </p>
+                          <p className="mt-1 text-xs leading-5 text-gray-500">
+                            New orders, messages, and customers will appear here.
+                          </p>
+                        </div>
+                      ) : (
+                        notifications.map((notification) => (
+                          <button
+                            key={notification.id}
+                            type="button"
+                            onClick={() => void handleNotificationClick(notification.id)}
+                            className={`block w-full rounded-lg border p-3 text-left transition ${
+                              notification.isRead
+                                ? 'border-gray-200 bg-white text-gray-600'
+                                : 'border-[#F28C28]/35 bg-[#FFF7F0] text-[#111111]'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-bold">{notification.title}</p>
+                                <p className="mt-1 text-xs leading-5 text-gray-600">
+                                  {notification.message}
+                                </p>
+                              </div>
+
+                              {!notification.isRead && (
+                                <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#F28C28]" />
+                              )}
+                            </div>
+
+                            <p className="mt-2 text-[10px] uppercase tracking-wide text-gray-400">
+                              {new Date(notification.createdAt).toLocaleString()}
+                            </p>
+                          </button>
+                        ))
+                      )}
                     </div>
 
                     <Link
                       href="/admin/custom-orders"
                       onClick={() => setIsNotificationsOpen(false)}
-                      className="block rounded-lg bg-[#EEF3F6] px-3 py-2 text-center text-sm font-semibold text-[#123B5D] transition hover:bg-[#123B5D] hover:text-white"
+                      className="mt-3 block rounded-lg bg-[#EEF3F6] px-3 py-2 text-center text-sm font-semibold text-[#123B5D] transition hover:bg-[#123B5D] hover:text-white"
                     >
                       View custom orders
                     </Link>

@@ -3,6 +3,16 @@ import { CartItem, Product } from '@/app/types';
 
 const LOCAL_CART_KEY = 'na_garments_cart';
 
+interface BackendCartResponse {
+  success: boolean;
+  message: string;
+  data: {
+    id: string;
+    userId: string;
+    items: CartItem[];
+  };
+}
+
 export const cartService = {
   /**
    * Fetches cart items from authenticated backend endpoint or falls back to local storage
@@ -11,8 +21,8 @@ export const cartService = {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (token) {
       try {
-        const response = await api.get<CartItem[]>('/cart');
-        return response.data;
+        const response = await api.get<BackendCartResponse>('/cart');
+        return response.data.data.items ?? [];
       } catch {
         return this.getLocalCart();
       }
@@ -35,7 +45,7 @@ export const cartService = {
 
     if (token) {
       try {
-        await api.post('/cart', {
+        await api.post('/cart/items', {
           productId: product.id,
           quantity,
           size: itemSize,
