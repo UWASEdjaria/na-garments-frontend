@@ -51,7 +51,7 @@ export default function FeaturedCategories() {
               href={`/shop?category=${category.slug}`}
               className="w-full bg-[#EEF3F6] text-[#123B5D] group-hover:bg-[#123B5D] group-hover:text-white font-bold text-xs uppercase tracking-wider py-2.5 rounded text-center transition-colors block"
             >
-              View Collection
+              Browse Designs
             </Link>
           </div>
         </div>

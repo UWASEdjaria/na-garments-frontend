@@ -8,7 +8,12 @@ import CustomOrderTextarea from './custom-order/CustomOrderTextarea';
 import useCustomOrderForm from '@/app/hooks/useCustomOrderForm';
 import { cloudinaryService } from '@/app/services/cloudinary.service';
 
-export default function CustomOrderForm() {
+interface CustomOrderFormProps {
+  initialProductId?: string;
+  initialGarmentType?: string;
+}
+
+export default function CustomOrderForm({ initialProductId, initialGarmentType }: CustomOrderFormProps = {}) {
   const {
     formData,
     isSubmitting,
@@ -17,7 +22,7 @@ export default function CustomOrderForm() {
     handleInputChange,
     handleTextareaChange,
     handleSubmit,
-  } = useCustomOrderForm();
+  } = useCustomOrderForm(initialProductId, initialGarmentType);
 
   const [imageUrl, setImageUrl] = useState('');
   const [referenceImages, setReferenceImages] = useState<string[]>([]);

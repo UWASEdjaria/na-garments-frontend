@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { CustomOrderFormData } from '@/app/types/custom-order';
 import { customOrderService } from '@/app/services/customOrder.service';
 
@@ -16,13 +16,22 @@ const initialFormData: CustomOrderFormData = {
   referenceImageUrls: [],
 };
 
-export default function useCustomOrderForm() {
-  const [formData, setFormData] =
-    useState<CustomOrderFormData>(initialFormData);
+export default function useCustomOrderForm(initialProductId?: string, initialGarmentType?: string) {
+  const [formData, setFormData] = useState<CustomOrderFormData>({
+    ...initialFormData,
+    ...(initialProductId ? { productId: initialProductId } : {}),
+    ...(initialGarmentType ? { garmentType: initialGarmentType } : {}),
+  });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    if (!successMessage) return;
+    const timeoutId = window.setTimeout(() => setSuccessMessage(''), 4000);
+    return () => window.clearTimeout(timeoutId);
+  }, [successMessage]);
 
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>

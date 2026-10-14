@@ -61,7 +61,8 @@ export interface SocialLink {
   ariaLabel: string;
 }
 // Backend Domain API Types
-export type StockStatus = 'low' | 'medium' | 'overstock';
+export type StockStatus = 'out_of_stock' | 'low' | 'normal' | 'overstock';
+export type ProductType = 'READY_TO_WEAR' | 'MADE_TO_ORDER';
 
 export interface ProductImage {
   id: string;
@@ -80,6 +81,12 @@ export interface Category {
   updatedAt?: string;
 }
 
+export interface CategoryMutationData {
+  name: string;
+  description?: string;
+  imageUrl?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -88,11 +95,14 @@ export interface Product {
   price: number;
   stockQuantity: number;
   minimumStockLevel: number;
+  maximumStockLevel: number;
   isAvailable: boolean;
+  productType: ProductType;
   stockStatus?: StockStatus;
   categoryId: string;
   category?: Category;
   images: ProductImage[];
+  imageUrl?: string;
   sizes: string[];
   colors: string[];
   createdAt: string;
@@ -113,4 +123,72 @@ export interface ProductQueryParams {
   slug?: string;
   page?: number;
   limit?: number;
+}
+
+export interface ProductOptions {
+  sizes: string[];
+  colors: string[];
+  productTypes: string[];
+}
+
+export interface ProductMutationData {
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  categoryId: string;
+  minimumStockLevel: number;
+  maximumStockLevel: number;
+  sizes: string[];
+  colors: string[];
+  isAvailable: boolean;
+  productType: ProductType;
+  imageUrl?: string;
+  image?: File;
+}
+
+export interface ProductPage {
+  data: Product[];
+  totalPages: number;
+}
+
+export interface StockEntry {
+  id: string;
+  batchCode: string;
+  productId: string;
+  quantity: number;
+  unitCost: number;
+  supplierNote?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  product: Product;
+}
+
+export interface StockSummary {
+  totalProducts: number;
+  lowStock: number;
+  outOfStock: number;
+  overstock: number;
+}
+
+export interface StockPage {
+  data: StockEntry[];
+  totalPages: number;
+  totalCount: number;
+  summary: StockSummary;
+}
+
+export interface StockQueryParams {
+  page: number;
+  limit: number;
+  search?: string;
+  status?: StockStatus;
+}
+
+export interface StockMutationData {
+  productId?: string;
+  batchCode?: string;
+  quantity: number;
+  unitCost: number;
+  supplierNote?: string;
 }

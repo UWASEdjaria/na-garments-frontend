@@ -8,6 +8,7 @@ export interface CreateCustomOrderRequest {
   description: string;
   additionalReqs?: string;
   referenceImageUrls?: string[];
+  productId?: string;
 }
 
 export interface CustomOrderFormData {
@@ -20,11 +21,13 @@ export interface CustomOrderFormData {
   description: string;
   additionalReqs: string;
   referenceImageUrls: string[];
+  productId?: string;
 }
 
 export interface CustomOrder {
   id: string;
   userId: string | null;
+  productId: string | null;
   name: string;
   email: string;
   phone: string;

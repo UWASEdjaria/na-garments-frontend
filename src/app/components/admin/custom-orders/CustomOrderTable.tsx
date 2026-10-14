@@ -1,14 +1,15 @@
-import Link from 'next/link';
 import { FiEye } from 'react-icons/fi';
 
 import { AdminCustomOrder } from '@/app/types/admin-custom-order';
 
 interface CustomOrderTableProps {
   orders: AdminCustomOrder[];
+  onView: (orderId: string) => void;
 }
 
 export default function CustomOrderTable({
   orders,
+  onView,
 }: CustomOrderTableProps) {
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -77,13 +78,14 @@ export default function CustomOrderTable({
                 </td>
 
                 <td className="px-6 py-4">
-                  <Link
-                    href={`/admin/custom-orders/${order.id}`}
+                  <button
+                    type="button"
+                    onClick={() => onView(order.id)}
                     className="inline-flex items-center gap-2 rounded-lg bg-[#F28C28] px-3 py-2 text-sm font-medium text-white transition hover:opacity-90"
                   >
                     <FiEye />
                     View
-                  </Link>
+                  </button>
                 </td>
               </tr>
             ))}
