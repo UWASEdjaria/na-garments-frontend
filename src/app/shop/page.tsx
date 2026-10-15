@@ -430,7 +430,7 @@ function ShopContent() {
                             <>
                               <div className="flex flex-col min-[380px]:flex-row min-[380px]:items-baseline justify-between gap-1.5 min-w-0">
                                 <span className="font-black text-sm sm:text-base text-[#123B5D] tracking-tight [overflow-wrap:anywhere]">
-                                  {format(Number(product.price))} <span className="text-xs font-bold text-gray-500">RWF</span>
+                                  {format(Number(product.price))}
                                 </span>
                               </div>
                               <div className="grid grid-cols-1 min-[640px]:grid-cols-2 gap-2">
