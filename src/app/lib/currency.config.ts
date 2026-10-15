@@ -1,22 +1,62 @@
+import countryToCurrency from 'country-to-currency';
+
+
+
 export interface CurrencyConfig {
-  code: string;
-  symbol: string;
-  name: string;
-  locale: string;
+code: string;
+symbol: string;
+name: string;
+locale: string;
 }
 
-export const SUPPORTED_CURRENCIES: Record<string, CurrencyConfig> = {
-  RWF: { code: 'RWF', symbol: 'RWF', name: 'Rwandan Franc', locale: 'rw-RW' },
-  USD: { code: 'USD', symbol: '$', name: 'US Dollar', locale: 'en-US' },
-  NGN: { code: 'NGN', symbol: '₦', name: 'Nigerian Naira', locale: 'en-NG' },
-};
 
-// ISO 3166-1 alpha-2 → currency code
-export const COUNTRY_TO_CURRENCY: Record<string, string> = {
-  RW: 'RWF',
-  US: 'USD',
-  NG: 'NGN',
+
+function createCurrencyConfig(code: string): CurrencyConfig {
+const formatter = new Intl.NumberFormat('en', {
+style: 'currency',
+currency: code,
+});
+
+
+
+const symbol =
+formatter.formatToParts(0).find((part) => part.type === 'currency')?.value ??
+code;
+
+
+
+const names = new Intl.DisplayNames(['en'], {
+type: 'currency',
+});
+
+
+
+return {
+code,
+symbol,
+name: names.of(code) ?? code,
+locale: 'en',
 };
+}
+
+
+
+const CURRENCY_CODES = [
+...new Set(Object.values(countryToCurrency)),
+];
+
+
+
+export const SUPPORTED_CURRENCIES: Record<string, CurrencyConfig> =
+Object.fromEntries(
+CURRENCY_CODES.map((code) => [code, createCurrencyConfig(code)]),
+);
+
+
+
+export const COUNTRY_TO_CURRENCY: Record<string, string> = countryToCurrency;
+
+
 
 export const DEFAULT_CURRENCY = 'RWF';
 export const BASE_CURRENCY = 'RWF';

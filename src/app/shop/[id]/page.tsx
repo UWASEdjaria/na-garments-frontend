@@ -222,8 +222,8 @@ export default function ProductDetailsPage() {
                 </>
               ) : (
                 <p className="mt-5 text-2xl font-black text-[#123B5D] sm:text-3xl">
-                  {formattedPrice}{' '}
-                  <span className="text-sm font-bold text-gray-500">RWF</span>
+                  {formattedPrice}
+                 
                 </p>
               )}
 
