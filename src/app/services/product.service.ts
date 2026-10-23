@@ -1,4 +1,4 @@
-﻿import { api } from '@/app/lib/api';
+import { api } from '@/app/lib/api';
 import { Product, Category, CategoryMutationData, ProductMutationData, ProductOptions, ProductPage, ProductQueryParams } from '@/app/types';
 
 const toFormData = (data: ProductMutationData): FormData => {

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -12,7 +12,7 @@ export default function FeaturedCategories() {
   useEffect(() => {
     async function loadCategories() {
       const fetchedCategories = await productService.getCategories();
-      setCategories(fetchedCategories.slice(0, 3));
+      setCategories(fetchedCategories);
     }
 
     loadCategories();
@@ -50,7 +50,7 @@ export default function FeaturedCategories() {
             <div className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#EEF3F6] px-4 py-3 text-xs font-bold uppercase tracking-wider text-[#123B5D] transition-colors duration-200 group-hover:bg-[#123B5D] group-hover:text-white">
               Browse Designs
               <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
-                →
+                â†’
               </span>
             </div>
           </div>
