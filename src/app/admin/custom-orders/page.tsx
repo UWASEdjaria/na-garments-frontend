@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+
 import { useState } from 'react';
-import { FiArrowLeft } from 'react-icons/fi';
+
 
 import CustomOrderDetailModal from '@/app/components/admin/custom-orders/CustomOrderDetailModal';
 import CustomOrderTable from '@/app/components/admin/custom-orders/CustomOrderTable';
@@ -23,18 +23,6 @@ export default function AdminCustomOrdersPage() {
           <section className="mb-6 sm:mb-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <Link
-                  href="/"
-                  className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-[#123B5D] transition-colors hover:text-[#F28C28] sm:text-sm"
-                >
-                  <FiArrowLeft />
-                  Back to Home
-                </Link>
-
-                <span className="mb-2 inline-block rounded-full border border-[#F28C28]/30 bg-[#123B5D]/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-[#123B5D] sm:text-xs">
-                  Admin Dashboard
-                </span>
-
                 <h1 className="text-2xl font-extrabold tracking-tight text-[#111111] sm:text-3xl lg:text-4xl">
                   Custom Orders
                 </h1>

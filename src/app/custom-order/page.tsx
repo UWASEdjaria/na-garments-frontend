@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
@@ -42,14 +41,7 @@ function CustomOrderContent() {
                   initialGarmentType={garmentType}
                 />
 
-                <div className="mt-3 text-center">
-                  <Link
-                    href="/"
-                    className="text-sm font-semibold text-[#123B5D] transition-colors hover:text-[#F28C28]"
-                  >
-                    ← Back to home
-                  </Link>
-                </div>
+               
               </div>
             </section>
 

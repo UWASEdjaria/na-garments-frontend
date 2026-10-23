@@ -34,6 +34,9 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [shippingAddr, setShippingAddr] = useState('');
   const [phone, setPhone] = useState('');
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
+  const [isGuest, setIsGuest] = useState(false);
   const [orderId, setOrderId] = useState('');
   const [rwfTotal, setRwfTotal] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,23 +44,71 @@ export default function CheckoutPage() {
 
   const loadCart = useCallback(async () => {
     const token = localStorage.getItem('token');
-    if (!token) { router.replace('/auth/login'); return; }
+    setIsGuest(!token);
     setIsLoading(true);
-    const cart = await cartService.getCart();
-    if (cart.length === 0) { router.replace('/cart'); return; }
-    setItems(cart);
-    setRwfTotal(cart.reduce((sum, i) => sum + Number(i.product.price) * i.quantity, 0));
-    setIsLoading(false);
+
+    try {
+      const cart = await cartService.getCart();
+
+      if (cart.length === 0) {
+        router.replace('/cart');
+        return;
+      }
+
+      setItems(cart);
+      setRwfTotal(
+        cart.reduce(
+          (sum, item) => sum + Number(item.product.price) * item.quantity,
+          0
+        )
+      );
+    } catch {
+      setError('Unable to load your cart. Please return to your cart and try again.');
+    } finally {
+      setIsLoading(false);
+    }
   }, [router]);
 
   useEffect(() => { void loadCart(); }, [loadCart]);
 
   const handlePlaceOrder = async () => {
-    if (!shippingAddr.trim()) { setError('Shipping address is required.'); return; }
+    if (!shippingAddr.trim()) {
+      setError('Shipping address is required.');
+      return;
+    }
+
+    if (isGuest) {
+      if (!guestName.trim()) {
+        setError('Your name is required.');
+        return;
+      }
+
+      if (!guestEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail.trim())) {
+        setError('Please enter a valid email address.');
+        return;
+      }
+    }
+
     setError('');
     setIsSubmitting(true);
+
     try {
-      const res = await api.post<OrderResponse>('/orders', { shippingAddr: shippingAddr.trim() });
+      const res = isGuest
+        ? await api.post<OrderResponse>('/orders/guest', {
+            name: guestName.trim(),
+            email: guestEmail.trim(),
+            shippingAddr: shippingAddr.trim(),
+            items: items.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              ...(item.size ? { size: item.size } : {}),
+              ...(item.color ? { color: item.color } : {}),
+            })),
+          })
+        : await api.post<OrderResponse>('/orders', {
+            shippingAddr: shippingAddr.trim(),
+          });
+
       setOrderId(res.data.data.id);
       setRwfTotal(Number(res.data.data.totalAmount));
       setStep('payment');
@@ -70,18 +121,33 @@ export default function CheckoutPage() {
   };
 
   const handleInitiatePayment = async () => {
-    if (!phone.trim()) { setError('Phone number is required for Mobile Money.'); return; }
+    if (!phone.trim()) {
+      setError('Phone number is required for Mobile Money.');
+      return;
+    }
+
     setError('');
     setIsSubmitting(true);
+
     try {
-      const res = await api.post<PaymentResponse>('/payments/initiate', {
+      const payload = {
         orderId,
         amount: rwfTotal,
         paymentMethod: 'MOMO',
         phoneNumber: phone.trim(),
-      });
+      };
+
+      const res = isGuest
+        ? await api.post<PaymentResponse>('/payments/guest/initiate', {
+            ...payload,
+            email: guestEmail.trim(),
+          })
+        : await api.post<PaymentResponse>('/payments/initiate', payload);
+
       if (res.data.success) {
         setStep('done');
+      } else {
+        setError(res.data.message || 'Payment initiation failed.');
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Payment initiation failed.';
@@ -169,6 +235,35 @@ export default function CheckoutPage() {
         {step === 'shipping' && (
           <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm space-y-4">
             <h2 className="text-base font-extrabold text-[#123B5D]">Shipping Details</h2>
+            {isGuest && (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Checkout as a guest. Your email will be used to link your payment to your order.
+                </p>
+                <label className="block text-sm font-semibold text-gray-700">
+                  Full name
+                  <input
+                    type="text"
+                    autoComplete="name"
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    required
+                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#F28C28] focus:ring-2 focus:ring-[#F28C28]/20"
+                  />
+                </label>
+                <label className="block text-sm font-semibold text-gray-700">
+                  Email address
+                  <input
+                    type="email"
+                    autoComplete="email"
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    required
+                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#F28C28] focus:ring-2 focus:ring-[#F28C28]/20"
+                  />
+                </label>
+              </div>
+            )}
             <label className="block text-sm font-semibold text-gray-700">
               Delivery address
               <textarea
@@ -235,9 +330,19 @@ export default function CheckoutPage() {
               Your order will be confirmed once payment is received.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-              <Link href="/account/orders" className="rounded-lg bg-[#F28C28] px-6 py-3 text-sm font-extrabold text-[#111111] hover:bg-[#123B5D] hover:text-white transition-colors">
-                View My Orders
-              </Link>
+              {isGuest ? (
+                <div className="rounded-lg bg-[#EEF3F6] p-4 text-sm text-gray-700">
+                  <p className="font-bold text-[#123B5D]">Your order reference</p>
+                  <p className="mt-1 break-all font-mono">{orderId}</p>
+                  <p className="mt-2">
+                    Please save this reference for your records.
+                  </p>
+                </div>
+              ) : (
+                <Link href="/account/orders" className="rounded-lg bg-[#F28C28] px-6py-3 text-sm font-extrabold text-[#111111] hover:bg-[#123B5D] hover:text-white transition-colors">
+                  View My Orders
+                </Link>
+              )}
               <Link href="/shop" className="rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-[#123B5D] hover:bg-[#EEF3F6] transition-colors">
                 Continue Shopping
               </Link>

@@ -175,6 +175,14 @@ export default function HomePage() {
           </SlideUp>
 
           <FeaturedCategories />
+          <div className="mt-6 text-center">
+            <Link
+             href="/shop"
+              className="inline-flex min-h-[44px] items-center justify-center rounded border border-[#123B5D] px-6 py-3 text-sm font-bold text-[#123B5D] transition-colors hover:bg-[#123B5D] hover:text-white"
+               >
+                   Explore All Categories →
+            </Link>
+          </div>
         </section>
 
         {/* 4. Featured Products */}
@@ -195,7 +203,7 @@ export default function HomePage() {
                 href="/shop"
                 className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-[#123B5D] transition-colors hover:text-[#F28C28] sm:text-sm"
               >
-                View All Products &rarr;
+                View All Designs &rarr;
               </Link>
             </div>
           </SlideUp>

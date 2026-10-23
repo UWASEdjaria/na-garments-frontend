@@ -21,7 +21,9 @@ const slugFromName = (name: string) =>
 export default function ProductForm({ categories, options, product, onClose, onSuccess }: ProductFormProps) {
   const [name, setName] = useState(product?.name ?? '');
   const [description, setDescription] = useState(product?.description ?? '');
-  const [price, setPrice] = useState(product?.price.toString() ?? '');
+  const [price, setPrice] = useState(
+    product?.price == null ? '' : String(product.price),
+  );
   const [categoryId, setCategoryId] = useState(product?.categoryId ?? '');
   const [minimumStockLevel, setMinimumStockLevel] = useState(String(product?.minimumStockLevel ?? 5));
   const [maximumStockLevel, setMaximumStockLevel] = useState(String(product?.maximumStockLevel ?? 100));
@@ -50,7 +52,13 @@ export default function ProductForm({ categories, options, product, onClose, onS
     const amount = Number(price);
     if (name.trim().length < 3) return setErrorMessage('Product name must be at least 3 characters.');
     if (description.trim().length < 5) return setErrorMessage('Description must be at least 5 characters.');
-    if (!Number.isFinite(amount) || amount <= 0) return setErrorMessage('Selling price must be greater than zero.');
+    if (price.trim() !== '' && (!Number.isFinite(amount) || amount <= 0)) {
+      return setErrorMessage('Selling price must be greater than zero when provided.');
+    }
+
+    if (productType === 'READY_TO_WEAR' && price.trim() === '') {
+      return setErrorMessage('Ready to Wear products must have a selling price.');
+    }
     if (!categoryId) return setErrorMessage('Select a product category.');
     if (!Number.isInteger(minimum) || minimum < 0 || !Number.isInteger(maximum) || maximum < 0) {
       return setErrorMessage('Stock thresholds must be whole numbers at or above zero.');
@@ -72,7 +80,7 @@ export default function ProductForm({ categories, options, product, onClose, onS
       name: name.trim(),
       slug: slugFromName(name),
       description: description.trim(),
-      price: amount,
+      price: price.trim() === '' ? null : amount,
       categoryId,
       minimumStockLevel: minimum,
       maximumStockLevel: maximum,
@@ -131,7 +139,16 @@ export default function ProductForm({ categories, options, product, onClose, onS
           </label>
           <div className="grid gap-4 sm:grid-cols-3">
             <label className="text-sm font-semibold text-gray-700">Selling price
-              <input required type="number" min="0.01" step="0.01" value={price} onChange={(event) => setPrice(event.target.value)} className={`${inputClass} mt-1.5`} />
+              <input
+                required={productType === 'READY_TO_WEAR'}
+                type="number"
+                min="0.01"
+                step="0.01"
+                value={price}
+                onChange={(event) => setPrice(event.target.value)}
+                placeholder={productType === 'MADE_TO_ORDER' ? 'Optional' : 'Enter selling price'}
+                className={`${inputClass} mt-1.5`}
+              />
             </label>
             <label className="text-sm font-semibold text-gray-700">Minimum stock
               <input required type="number" min="0" step="1" value={minimumStockLevel} onChange={(event) => setMinimumStockLevel(event.target.value)} className={`${inputClass} mt-1.5`} />

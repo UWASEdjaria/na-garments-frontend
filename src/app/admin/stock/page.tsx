@@ -9,6 +9,7 @@ import { getApiErrorMessage } from '@/app/lib/api-error';
 import { productService } from '@/app/services/product.service';
 import { stockService } from '@/app/services/stock.service';
 import type { Product, StockEntry, StockPage, StockStatus } from '@/app/types';
+import ConfirmDeleteModal from '@/app/components/admin/ConfirmDeleteModal';
 
 const statuses: { value: StockStatus | ''; label: string }[] = [
   { value: '', label: 'All statuses' },
@@ -53,6 +54,9 @@ export default function AdminStockPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [editingEntry, setEditingEntry] = useState<StockEntry>();
   const [isFormOpen, setIsFormOpen] = useState(false);
+ 
+  const [stockToDelete, setStockToDelete] = useState<StockEntry | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchStock = useCallback(async () => {
     setIsLoading(true);
@@ -92,19 +96,31 @@ export default function AdminStockPage() {
     void fetchStock();
   };
 
-  const deleteStock = async (entry: StockEntry) => {
-    if (!window.confirm(`Delete stock batch ${entry.batchCode}? This will reduce the product's total stock by ${entry.quantity}.`)) return;
-    setErrorMessage('');
-    setSuccessMessage('');
-    try {
-      await stockService.deleteStock(entry.id);
-      setSuccessMessage(`Stock batch ${entry.batchCode} deleted.`);
-      void fetchStock();
-    } catch (error) {
-      setErrorMessage(getApiErrorMessage(error instanceof Error ? error : new Error('Unable to delete this stock entry.'), 'Unable to delete this stock entry.'));
-    }
-  };
+  const deleteStock = async () => {
+  if (!stockToDelete || isDeleting) return;
 
+  const entry = stockToDelete;
+  setIsDeleting(true);
+  setErrorMessage('');
+  setSuccessMessage('');
+
+  try {
+    await stockService.deleteStock(entry.id);
+    setStockToDelete(null);
+    setSuccessMessage(`Stock batch ${entry.batchCode} deleted.`);
+    await fetchStock();
+  } catch (error) {
+    setStockToDelete(null);
+    setErrorMessage(
+      getApiErrorMessage(
+        error instanceof Error ? error : new Error('Unable to delete this stock entry.'),
+        'Unable to delete this stock entry.'
+      )
+    );
+  } finally {
+    setIsDeleting(false);
+  }
+};
   const statCards = [
     { label: 'Total products', value: result.summary.totalProducts, accent: 'border-[#123B5D]' },
     { label: 'Low stock', value: result.summary.lowStock, accent: 'border-amber-500' },
@@ -115,7 +131,7 @@ export default function AdminStockPage() {
   return (
     <>
           <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div><p className="mb-2 inline-block rounded-full border border-[#F28C28]/30 bg-[#123B5D]/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-[#123B5D]">Admin Dashboard</p><h1 className="text-2xl font-extrabold text-[#111111] sm:text-3xl">Stock Management</h1><p className="mt-1 text-sm text-gray-500">Track stock receipts, current quantities, and stock health.</p></div>
+            <div><h1 className="text-2xl font-extrabold text-[#111111] sm:text-3xl">Stock Management</h1><p className="mt-1 text-sm text-gray-500">Track stock receipts, current quantities, and stock health.</p></div>
             <button type="button" disabled={isProductsLoading || products.length === 0} onClick={() => { setEditingEntry(undefined); setIsFormOpen(true); }} className="inline-flex items-center justify-center gap-2 rounded-md bg-[#123B5D] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#F28C28] hover:text-[#111111] disabled:cursor-not-allowed disabled:opacity-60"><FiPlus aria-hidden="true" />Add stock</button>
           </header>
 
@@ -150,7 +166,7 @@ export default function AdminStockPage() {
                       <td className="px-4 py-3 whitespace-nowrap">{entry.unitCost.toLocaleString()} RWF</td>
                       <td className="px-4 py-3"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${presentation.className}`}>{presentation.label}</span></td>
                       <td className="px-4 py-3 whitespace-nowrap text-gray-600">{new Date(entry.createdAt).toLocaleDateString()}</td>
-                      <td className="px-4 py-3"><div className="flex items-center gap-1"><button type="button" onClick={() => { setEditingEntry(entry); setIsFormOpen(true); }} aria-label={`Edit batch ${entry.batchCode}`} className="rounded-md p-2 text-[#123B5D] hover:bg-[#EEF3F6]"><FiEdit2 /></button><button type="button" onClick={() => void deleteStock(entry)} aria-label={`Delete batch ${entry.batchCode}`} className="rounded-md p-2 text-red-600 hover:bg-red-50"><FiTrash2 /></button></div></td>
+                      <td className="px-4 py-3"><div className="flex items-center gap-1"><button type="button" onClick={() => { setEditingEntry(entry); setIsFormOpen(true); }} aria-label={`Edit batch ${entry.batchCode}`} className="rounded-md p-2 text-[#123B5D] hover:bg-[#EEF3F6]"><FiEdit2 /></button><button type="button"onClick={() => setStockToDelete(entry)} aria-label={`Delete batch ${entry.batchCode}`} className="rounded-md p-2 text-red-600 hover:bg-red-50"><FiTrash2 /></button></div></td>
                     </tr>;
                   })}</tbody>
                 </table>
@@ -160,6 +176,18 @@ export default function AdminStockPage() {
             {!isLoading && result.totalPages > 1 && <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3"><p className="text-xs text-gray-500">{result.totalCount} entries · Page {page} of {result.totalPages}</p><div className="flex gap-2"><button type="button" disabled={page <= 1} onClick={() => setPage((current) => current - 1)} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-40">Previous</button><button type="button" disabled={page >= result.totalPages} onClick={() => setPage((current) => current + 1)} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-40">Next</button></div></div>}
           </section>
       {isFormOpen && <StockForm products={products} entry={editingEntry} onClose={() => { setIsFormOpen(false); setEditingEntry(undefined); }} onSuccess={handleSaved} />}
-    </>
-  );
-}
+              {stockToDelete && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
+                    <div className="w-full max-w-sm rounded-lg bg-white p-4 shadow-2xl">
+                    <ConfirmDeleteModal
+                        itemName={`stock batch ${stockToDelete.batchCode}`}
+                        isDeleting={isDeleting}
+                        onCancel={() => setStockToDelete(null)}
+                        onConfirm={() => void deleteStock()}
+                     />
+                 </div>
+               </div>
+              )}
+            </>
+          );
+        }

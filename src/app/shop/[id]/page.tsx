@@ -20,9 +20,13 @@ import SlideUp from '@/app/components/animations/SlideUp';
 import { Product } from '@/app/types';
 import { productService } from '@/app/services/product.service';
 import { cartService } from '@/app/services/cart.service';
+import { useToast } from '@/app/components/ToastProvider';
+import { useCurrency } from '@/app/components/CurrencyProvider';
 
 export default function ProductDetailsPage() {
   const params = useParams();
+  const { showToast } = useToast();
+  const { format } = useCurrency();
   const productId = params.id as string;
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -32,35 +36,66 @@ export default function ProductDetailsPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [cartMessage, setCartMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (cartMessage !== 'Added to your cart.') return;
-    const timeoutId = window.setTimeout(() => setCartMessage(null), 4000);
-    return () => window.clearTimeout(timeoutId);
-  }, [cartMessage]);
 
-  useEffect(() => {
+    useEffect(() => {
     let isCurrentRequest = true;
+    let isInitialLoad = true;
 
-    productService
-      .getProductById(productId)
-      .then((foundProduct) => {
+    const loadProduct = async () => {
+      try {
+        const foundProduct = await productService.getProductById(productId);
+
         if (!isCurrentRequest) return;
-        setProduct(foundProduct);
-        const primaryIndex = foundProduct.images?.findIndex((image) => image.isPrimary);
-        setSelectedImageIndex(primaryIndex >= 0 ? primaryIndex : 0);
-        setQuantity(1);
-      })
-      .catch(() => {
-        if (isCurrentRequest) setError('We could not load this product. Please try again.');
-      })
-      .finally(() => {
-        if (isCurrentRequest) setIsLoading(false);
-      });
 
-    return () => { isCurrentRequest = false; };
+        setProduct(foundProduct);
+        setError(null);
+
+        const primaryIndex =
+          foundProduct.images?.findIndex((image) => image.isPrimary) ?? -1;
+
+        setSelectedImageIndex((currentIndex) => {
+          if (currentIndex >= foundProduct.images.length) {
+            return primaryIndex >= 0 ? primaryIndex : 0;
+          }
+
+          return currentIndex;
+        });
+      } catch {
+        if (isCurrentRequest && isInitialLoad) {
+          setError('We could not load this product. Please try again.');
+        }
+      } finally {
+        if (isCurrentRequest && isInitialLoad) {
+          setIsLoading(false);
+          isInitialLoad = false;
+        }
+      }
+    };
+
+    void loadProduct();
+
+    const refreshInterval = window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        void loadProduct();
+      }
+    }, 30_000);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void loadProduct();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      isCurrentRequest = false;
+      window.clearInterval(refreshInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [productId, retryCount]);
+
 
   const handleRetry = () => {
     setProduct(null);
@@ -71,13 +106,23 @@ export default function ProductDetailsPage() {
 
   const handleAddToCart = async () => {
     if (!product) return;
+
     setIsAddingToCart(true);
-    setCartMessage(null);
+
     try {
       await cartService.addToCart(product, quantity);
-      setCartMessage('Added to your cart.');
+
+      showToast({
+        type: 'success',
+        title: 'Added to cart',
+        description: `${quantity} × ${product.name} added to your cart.`,
+      });
     } catch {
-      setCartMessage('Could not add this item. Please try again.');
+      showToast({
+        type: 'error',
+        title: 'Could not add to cart',
+        description: 'Please try again.',
+      });
     } finally {
       setIsAddingToCart(false);
     }
@@ -139,7 +184,7 @@ export default function ProductDetailsPage() {
   const activeImage = images[selectedImageIndex]?.url || productService.getPrimaryImageUrl(product);
   const isMadeToOrder = product.productType === 'MADE_TO_ORDER';
   const isInStock = product.isAvailable && product.stockQuantity > 0;
-  const formattedPrice = Number(product.price).toLocaleString();
+  const formattedPrice = format(Number(product.price));
 
   return pageFrame(
     <>
@@ -223,7 +268,6 @@ export default function ProductDetailsPage() {
               ) : (
                 <p className="mt-5 text-2xl font-black text-[#123B5D] sm:text-3xl">
                   {formattedPrice}
-                 
                 </p>
               )}
 
@@ -239,7 +283,7 @@ export default function ProductDetailsPage() {
                 </p>
               </div>
 
-              {/* Availability — ready-to-wear only */}
+              {/* Availability â€” ready-to-wear only */}
               {!isMadeToOrder && (
                 <div className="mt-7 rounded-xl bg-[#EEF3F6] p-4">
                   <div className="flex items-center gap-3">
@@ -260,7 +304,7 @@ export default function ProductDetailsPage() {
                 </div>
               )}
 
-              {/* Quantity + cart — ready-to-wear only */}
+              {/* Quantity + cart â€” ready-to-wear only */}
               {!isMadeToOrder && (
                 <div className="mt-7">
                   <p className="mb-2 text-sm font-bold text-[#111111]">Quantity</p>
@@ -300,16 +344,6 @@ export default function ProductDetailsPage() {
                     </button>
                   </div>
 
-                  {cartMessage && (
-                    <p
-                      role="status"
-                      className={`mt-3 text-sm font-semibold ${
-                        cartMessage === 'Added to your cart.' ? 'text-green-700' : 'text-red-600'
-                      }`}
-                    >
-                      {cartMessage}
-                    </p>
-                  )}
                 </div>
               )}
 
@@ -375,3 +409,4 @@ export default function ProductDetailsPage() {
     </>
   );
 }
+

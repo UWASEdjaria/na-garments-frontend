@@ -10,12 +10,14 @@ import { cartService } from '@/app/services/cart.service';
 import { api } from '@/app/lib/api';
 import { productService } from '@/app/services/product.service';
 import { useCurrency } from '@/app/components/CurrencyProvider';
+import { useToast } from '@/app/components/ToastProvider';
 import type { CartItem } from '@/app/types';
 
 export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { format } = useCurrency();
+  const { showToast } = useToast();
 
   const loadCart = useCallback(async () => {
     setIsLoading(true);
@@ -29,36 +31,74 @@ export default function CartPage() {
   const updateQuantity = async (item: CartItem, delta: number) => {
     const newQty = item.quantity + delta;
     if (newQty < 1) return;
-    const token = localStorage.getItem('token');
-    if (token && item.id && !item.id.startsWith('local-')) {
-      await api.put(`/cart/items/${item.id}`, { quantity: newQty });
-      await loadCart();
-    } else {
-      const stored = cartService.getLocalCart();
-      const updated = stored.map((i) =>
-        i.productId === item.productId && i.size === item.size && i.color === item.color
-          ? { ...i, quantity: newQty }
-          : i
-      );
-      localStorage.setItem('na_garments_cart', JSON.stringify(updated));
-      window.dispatchEvent(new Event('cart_updated'));
-      setItems(updated);
+
+    try {
+      const token = localStorage.getItem('token');
+
+      if (token && item.id && !item.id.startsWith('local-')) {
+        await api.put(`/cart/items/${item.id}`, { quantity: newQty });
+        await loadCart();
+      } else {
+        const stored = cartService.getLocalCart();
+        const updated = stored.map((i) =>
+          i.productId === item.productId &&
+          i.size === item.size &&
+          i.color === item.color
+            ? { ...i, quantity: newQty }
+            : i
+        );
+
+        localStorage.setItem('na_garments_cart', JSON.stringify(updated));
+        window.dispatchEvent(new Event('cart_updated'));
+        setItems(updated);
+      }
+
+      showToast({
+        type: 'success',
+        title: 'Cart updated',
+        description: 'The product quantity was updated.',
+      });
+    } catch {
+      showToast({
+        type: 'error',
+        title: 'Could not update cart',
+        description: 'Please try again.',
+      });
     }
   };
 
   const removeItem = async (item: CartItem) => {
-    const token = localStorage.getItem('token');
-    if (token && item.id && !item.id.startsWith('local-')) {
-      await api.delete(`/cart/items/${item.id}`);
-      await loadCart();
-    } else {
-      const stored = cartService.getLocalCart();
-      const updated = stored.filter(
-        (i) => !(i.productId === item.productId && i.size === item.size && i.color === item.color)
-      );
-      localStorage.setItem('na_garments_cart', JSON.stringify(updated));
-      window.dispatchEvent(new Event('cart_updated'));
-      setItems(updated);
+    try {
+      const token = localStorage.getItem('token');
+
+      if (token && item.id && !item.id.startsWith('local-')) {
+        await api.delete(`/cart/items/${item.id}`);
+        await loadCart();
+      } else {
+        const stored = cartService.getLocalCart();
+        const updated = stored.filter(
+          (i) =>
+            !(i.productId === item.productId &&
+              i.size === item.size &&
+              i.color === item.color)
+        );
+
+        localStorage.setItem('na_garments_cart', JSON.stringify(updated));
+        window.dispatchEvent(new Event('cart_updated'));
+        setItems(updated);
+      }
+
+      showToast({
+        type: 'success',
+        title: 'Removed from cart',
+        description: 'The product was removed from your cart.',
+      });
+    } catch {
+      showToast({
+        type: 'error',
+        title: 'Could not remove item',
+        description: 'Please try again.',
+      });
     }
   };
 

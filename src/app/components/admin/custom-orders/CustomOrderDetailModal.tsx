@@ -63,7 +63,7 @@ export default function CustomOrderDetailModal({ orderId, onClose }: CustomOrder
       >
         <header className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-5 py-4 sm:px-7">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#F28C28]">Admin Dashboard</p>
+<p className="text-[10px] font-bold uppercase tracking-widest text-[#F28C28]">Admin Dashboard</p>
             <h2 id="custom-order-detail-title" className="mt-1 text-xl font-extrabold text-[#123B5D]">Custom order details</h2>
           </div>
           <button
