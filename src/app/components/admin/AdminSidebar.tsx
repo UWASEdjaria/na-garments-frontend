@@ -1,18 +1,21 @@
-'use client';
+﻿'use client';
 
 
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { FiClipboard, FiLayers, FiMail, FiMenu, FiPackage, FiShoppingBag, FiX } from 'react-icons/fi';
+import {  FiHome,FiClipboard, FiLayers, FiMail, FiMenu, FiPackage, FiShoppingBag, FiShoppingCart, FiUsers, FiX } from 'react-icons/fi';
 
 const links = [
+{ label: 'Home', href: '/', icon: FiHome },
 { label: 'Custom orders', href: '/admin/custom-orders', icon: FiClipboard },
 { label: 'Products', href: '/admin/products', icon: FiShoppingBag },
 { label: 'Categories', href: '/admin/categories', icon: FiLayers },
 { label: 'Messages', href: '/admin/messages', icon: FiMail },
-{ label: 'Stock', href: '/admin/stock', icon: FiPackage },
+{ label: 'Stock', href: '/admin/stock', icon: FiPackage },
+{ label: 'Users', href: '/admin/users', icon: FiUsers },
+{ label: 'Cart Dashboard', href: '/admin/carts', icon: FiShoppingCart },
 ];
 
 export default function AdminSidebar() {
@@ -40,9 +43,10 @@ return (
      </p>
 
     {links.map(({ label, href, icon: Icon }) => {
-      const active =
-        pathname === href || pathname.startsWith(`${href}/`);
-
+    const active =
+        href === '/'
+          ? pathname === '/'
+          : pathname === href || pathname.startsWith(`${href}/`);
       return (
         <Link
           key={href}
@@ -66,3 +70,5 @@ return (
 
 );
 }
+
+

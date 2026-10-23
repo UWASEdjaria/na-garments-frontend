@@ -94,7 +94,7 @@ export default function WishlistPage() {
                   <div className="relative aspect-square bg-[#F8FAFC]">
                     <Image src={imageUrl} alt={product.name} fill unoptimized className="object-contain p-3" />
                     {isMadeToOrder && (
-                      <span className="absolute top-2 left-2 rounded-full bg-[#F28C28] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#111111]">
+                      <span className="absolute top-2 left-2 rounded-full bg-[#FFF0DF] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#9A4D00]">
                         Made to Order
                       </span>
                     )}

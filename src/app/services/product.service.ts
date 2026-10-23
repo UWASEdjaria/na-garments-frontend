@@ -1,4 +1,4 @@
-import { api } from '@/app/lib/api';
+﻿import { api } from '@/app/lib/api';
 import { Product, Category, CategoryMutationData, ProductMutationData, ProductOptions, ProductPage, ProductQueryParams } from '@/app/types';
 
 const toFormData = (data: ProductMutationData): FormData => {
@@ -6,7 +6,7 @@ const toFormData = (data: ProductMutationData): FormData => {
   formData.append('name', data.name);
   formData.append('slug', data.slug);
   formData.append('description', data.description);
-  formData.append('price', String(data.price));
+  formData.append('price', data.price === null ? '' : String(data.price));
   formData.append('categoryId', data.categoryId);
   formData.append('minimumStockLevel', String(data.minimumStockLevel));
   formData.append('maximumStockLevel', String(data.maximumStockLevel));
@@ -34,6 +34,25 @@ export const productService = {
     return [];
   },
 
+  async getAllProducts(params?: ProductQueryParams): Promise<Product[]> {
+    const firstResponse = await api.get<ProductPage>('/products', {
+      params: { ...params, page: 1, limit: 100 },
+    });
+
+    const firstPage = firstResponse.data;
+    const products = [...firstPage.data];
+    const totalPages = firstPage.totalPages;
+
+    for (let page = 2; page <= totalPages; page++) {
+      const response = await api.get<ProductPage>('/products', {
+        params: { ...params, page, limit: 100 },
+      });
+
+      products.push(...response.data.data);
+    }
+
+    return products;
+  },
   async getAdminProducts(params: ProductQueryParams): Promise<ProductPage> {
     const response = await api.get<ProductPage>('/products', { params });
     return response.data;

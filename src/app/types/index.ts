@@ -135,7 +135,7 @@ export interface ProductMutationData {
   name: string;
   slug: string;
   description: string;
-  price: number;
+  price: number | null;
   categoryId: string;
   minimumStockLevel: number;
   maximumStockLevel: number;

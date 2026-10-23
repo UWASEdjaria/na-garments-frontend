@@ -4,10 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FiEye, FiMail, FiMail as FiMailRead, FiRefreshCw, FiTrash2 } from 'react-icons/fi';
 
 import ContactMessageModal from '@/app/components/admin/messages/ContactMessageModal';
-import { ToastProvider, useToast } from '@/app/components/ToastProvider';
+import { useToast } from '@/app/components/ToastProvider';
 import { getApiErrorMessage } from '@/app/lib/api-error';
 import { contactService } from '@/app/services/contact.service';
 import type { ContactMessage } from '@/app/types/contact';
+
+import ConfirmDeleteModal from '@/app/components/admin/ConfirmDeleteModal';
 
 type MessageFilter = 'all' | 'unread' | 'read';
 
@@ -17,6 +19,8 @@ export default function AdminMessagesPage() {
   const [filter, setFilter] = useState<MessageFilter>('all');
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [messageToDelete, setMessageToDelete] = useState<ContactMessage | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const { showToast } = useToast();
@@ -85,37 +89,51 @@ export default function AdminMessagesPage() {
       });
     }
   };
+const deleteMessage = async () => {
+  if (!messageToDelete || isDeleting) return;
 
-  const deleteMessage = async (message: ContactMessage) => {
-    if (!window.confirm(`Delete the message from ${message.names}?`)) return;
-    setErrorMessage('');
-    setSuccessMessage('');
-    try {
-      await contactService.deleteMessage(message.id);
-      setMessages((current) => current.filter((item) => item.id !== message.id));
-      const statusText = 'Message deleted.';
-      setSuccessMessage(statusText);
-      showToast({
-        type: 'success',
-        title: 'Message deleted',
-        description: statusText,
-      });
-    } catch (error) {
-      const message = getApiErrorMessage(error instanceof Error ? error : new Error('Unable to delete this message.'), 'Unable to delete this message.');
-      setErrorMessage(message);
-      showToast({
-        type: 'error',
-        title: 'Delete failed',
-        description: message,
-      });
-    }
-  };
+  const message = messageToDelete;
+  setIsDeleting(true);
+  setErrorMessage('');
+  setSuccessMessage('');
+
+  try {
+    await contactService.deleteMessage(message.id);
+    setMessages((current) => current.filter((item) => item.id !== message.id));
+
+    const statusText = 'Message deleted.';
+    setSuccessMessage(statusText);
+    setMessageToDelete(null);
+
+    showToast({
+      type: 'success',
+      title: 'Message deleted',
+      description: statusText,
+    });
+  } catch (error) {
+    const errorText = getApiErrorMessage(
+      error instanceof Error ? error : new Error('Unable to delete this message.'),
+      'Unable to delete this message.'
+    );
+
+    setErrorMessage(errorText);
+
+    showToast({
+      type: 'error',
+      title: 'Delete failed',
+      description: errorText,
+    });
+  } finally {
+    setIsDeleting(false);
+  }
+};
+
 
   return (
     <>
       <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="mb-2 inline-block rounded-full border border-[#F28C28]/30 bg-[#123B5D]/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-[#123B5D]">Admin Dashboard</p>
+         
           <h1 className="text-2xl font-extrabold text-[#111111] sm:text-3xl">Messages</h1>
           <p className="mt-1 text-sm text-gray-500">Contact enquiries from the nagarments website.</p>
         </div>
@@ -155,7 +173,7 @@ export default function AdminMessagesPage() {
                 <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
                   <button type="button" onClick={() => setSelectedMessageId(message.id)} className="inline-flex items-center gap-1.5 rounded-md bg-[#123B5D] px-3 py-2 text-xs font-semibold text-white hover:bg-[#F28C28] hover:text-[#111111]"><FiEye aria-hidden="true" />View</button>
                   <button type="button" onClick={() => void updateReadStatus(message)} aria-label={message.isRead ? `Mark message from ${message.names} unread` : `Mark message from ${message.names} read`} className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 px-3 py-2 text-xs font-semibold text-[#123B5D] hover:bg-[#EEF3F6]">{message.isRead ? <FiMail aria-hidden="true" /> : <FiMailRead aria-hidden="true" />}{message.isRead ? 'Mark unread' : 'Mark read'}</button>
-                  <button type="button" onClick={() => void deleteMessage(message)} aria-label={`Delete message from ${message.names}`} className="inline-flex items-center justify-center rounded-md border border-red-200 p-2 text-red-600 hover:bg-red-50"><FiTrash2 aria-hidden="true" /></button>
+                  <button type="button" onClick={() => setMessageToDelete(message)} aria-label={`Delete message from ${message.names}`} className="inline-flex items-center justify-center rounded-md border border-red-200 p-2 text-red-600 hover:bg-red-50"><FiTrash2 aria-hidden="true" /></button>
                 </div>
               </div>
             </li>)}
@@ -163,7 +181,25 @@ export default function AdminMessagesPage() {
         )}
       </section>
 
-      {selectedMessageId && <ContactMessageModal messageId={selectedMessageId} onClose={() => setSelectedMessageId(null)} />}
+      {selectedMessageId && (
+  <ContactMessageModal
+    messageId={selectedMessageId}
+    onClose={() => setSelectedMessageId(null)}
+  />
+)}
+
+{messageToDelete && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
+    <div className="w-full max-w-sm rounded-lg bg-white p-4 shadow-2xl">
+      <ConfirmDeleteModal
+        itemName={`message from ${messageToDelete.names}`}
+        isDeleting={isDeleting}
+        onCancel={() => setMessageToDelete(null)}
+        onConfirm={() => void deleteMessage()}
+      />
+    </div>
+  </div>
+)}
     </>
   );
 }

@@ -25,12 +25,25 @@ export default function FeaturedProducts() {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {products.map((product) => {
         const isMadeToOrder = product.productType === 'MADE_TO_ORDER';
+
         return (
           <div
             key={product.id}
             className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col min-w-0"
           >
-            <Link href={`/shop/${product.id}`} className="block" aria-label={`View ${product.name}`}>
+            <div className="h-10 px-3 flex items-center">
+              {isMadeToOrder && (
+                <span className="inline-flex rounded-full bg-[#FFF0DF] px-2.5 py-1 text-[10px] font-semibold tracking-wide text-[#9A4D00]">
+                  Made to Order
+                </span>
+              )}
+            </div>
+
+            <Link
+              href={`/shop/${product.id}`}
+              className="block"
+              aria-label={`View ${product.name}`}
+            >
               <div className="relative h-52 sm:h-48 w-full bg-gray-100">
                 <Image
                   src={productService.getPrimaryImageUrl(product)}
@@ -40,28 +53,29 @@ export default function FeaturedProducts() {
                   className="object-contain p-3 transition-transform duration-300 hover:scale-105"
                   unoptimized
                 />
-                {isMadeToOrder && (
-                  <span className="absolute top-2 left-2 rounded-full bg-[#F28C28] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#111111]">
-                    Made to Order
-                  </span>
-                )}
               </div>
 
               <div className="p-4">
                 <span className="text-[11px] font-semibold text-[#123B5D] uppercase tracking-wide">
                   {product.category?.name}
                 </span>
+
                 <h3 className="font-bold text-sm text-[#111111] mt-1 line-clamp-2 break-words">
                   {product.name}
                 </h3>
-                <p className="text-xs text-gray-500 mt-1 line-clamp-2">{product.description}</p>
+
+                <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                  {product.description}
+                </p>
               </div>
             </Link>
 
             <div className="px-4 pb-4 mt-auto">
               <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
                 {isMadeToOrder ? (
-                  <span className="text-xs text-gray-500 italic">Price on request</span>
+                  <span className="text-xs text-gray-500 italic">
+                    Price on request
+                  </span>
                 ) : (
                   <span className="font-extrabold text-sm text-[#123B5D] break-words">
                     {format(Number(product.price))}
