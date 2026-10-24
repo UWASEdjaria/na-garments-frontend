@@ -106,7 +106,7 @@ export const SOCIAL_LINKS: SocialLink[] = [
   },
   {
     platform: 'TikTok',
-    href: 'https://www.tiktok.com/@nagarmentss',
+    href: 'https://tiktok.com',
     ariaLabel: 'TikTok',
   },
   {

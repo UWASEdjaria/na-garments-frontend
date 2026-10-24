@@ -17,18 +17,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://nagarments.com"),
 
-  icons: {
-    icon: "/icon.png",
-    apple: "/apple-icon.png",
-  },
-
   title: {
     template: "%s | nagarments",
     default: "nagarments | Clothing Made for Work, School & Everyday Life",
   },
 
   description:
-    "nagarments makes school uniforms, workwear, menâ€™s clothing, ready-to-wear garments, and custom clothing in Kigali, Rwanda.",
+    "nagarments makes school uniforms, workwear, men’s clothing, ready-to-wear garments, and custom clothing in Kigali, Rwanda.",
 
   keywords: [
     "nagarments",
@@ -44,19 +39,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "nagarments | Clothing Made for Work, School & Everyday Life",
     description:
-      "School uniforms, workwear, menâ€™s clothing, ready-to-wear garments, and custom clothing made in Kigali, Rwanda.",
+      "School uniforms, workwear, men’s clothing, ready-to-wear garments, and custom clothing made in Kigali, Rwanda.",
     url: "https://nagarments.com",
     siteName: "nagarments",
     type: "website",
     locale: "en_RW",
-    images: [
-      {
-        url: "/nagarments-logo.png",
-        width: 1503,
-        height: 670,
-        alt: "nagarments logo",
-      },
-    ],
   },
 };
 
