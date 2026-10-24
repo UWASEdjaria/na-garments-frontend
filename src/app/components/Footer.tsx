@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { CONTACT_INFO, FOOTER_COLLECTIONS, FOOTER_PAGES, SOCIAL_LINKS } from '../lib/constants';
 import Image from 'next/image';
 import {
@@ -20,7 +23,19 @@ const SOCIAL_COLORS = {
   TikTok: 'bg-black',
   WhatsApp: 'bg-[#25D366]',
 };
+
 export default function Footer() {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  // Helper to check if a collection link matches the current category URL
+  const isCollectionActive = (href: string) => {
+    if (pathname !== '/shop') return false;
+    const currentCategory = searchParams.get('category');
+    if (!currentCategory) return false;
+    return href.includes(`category=${currentCategory}`);
+  };
+
   return (
     <footer className="bg-[#111111] text-[#EEF3F6] pt-14 pb-8 border-t-4 border-[#F28C28] w-full overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -37,7 +52,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed max-w-sm">
-              nagarments is Rwanda?s premier apparel manufacturer and bespoke tailoring studio. We produce tailored school uniforms, industrial workwear, and bespoke men?s fashion crafted for precision, fit, and endurance.
+              nagarments is Rwanda&apos;s premier apparel manufacturer and bespoke tailoring studio. We produce tailored school uniforms, industrial workwear, and bespoke men&apos;s fashion crafted for precision, fit, and endurance.
             </p>
             <div className="pt-2">
               <span className="inline-block text-xs font-semibold text-[#F28C28] uppercase tracking-widest bg-[#123B5D]/40 px-3 py-1 rounded border border-[#123B5D]">
@@ -52,16 +67,23 @@ export default function Footer() {
               Collections
             </h3>
             <ul className="space-y-2">
-              {FOOTER_COLLECTIONS.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className="text-xs sm:text-sm text-gray-400 hover:text-[#F28C28] transition-colors inline-block py-0.5"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+              {FOOTER_COLLECTIONS.map((item) => {
+                const active = isCollectionActive(item.href);
+                return (
+                  <li key={item.label}>
+                    <Link
+                      href={item.href}
+                      className={`text-xs sm:text-sm transition-colors inline-block py-0.5 ${
+                        active
+                          ? 'text-[#F28C28] font-bold'
+                          : 'text-gray-400 hover:text-[#F28C28]'
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
@@ -71,16 +93,23 @@ export default function Footer() {
               Quick Links
             </h3>
             <ul className="space-y-2">
-              {FOOTER_PAGES.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className="text-xs sm:text-sm text-gray-400 hover:text-[#F28C28] transition-colors inline-block py-0.5"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+              {FOOTER_PAGES.map((item) => {
+                const active = pathname === item.href;
+                return (
+                  <li key={item.label}>
+                    <Link
+                      href={item.href}
+                      className={`text-xs sm:text-sm transition-colors inline-block py-0.5 ${
+                        active
+                          ? 'text-[#F28C28] font-bold'
+                          : 'text-gray-400 hover:text-[#F28C28]'
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
@@ -147,13 +176,13 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     aria-label={s.platform}
                     className={`w-8 h-8 rounded-full text-white transition-all duration-200 flex items-center justify-center hover:scale-105 ${
-                    SOCIAL_COLORS[s.platform as keyof typeof SOCIAL_COLORS]
-                  }`}
+                      SOCIAL_COLORS[s.platform as keyof typeof SOCIAL_COLORS]
+                    }`}
                   >
                     {(() => {
-                  const Icon = SOCIAL_ICONS[s.platform as keyof typeof SOCIAL_ICONS];
-                  return Icon ? <Icon className="w-4 h-4" /> : null;
-                  })()}
+                      const Icon = SOCIAL_ICONS[s.platform as keyof typeof SOCIAL_ICONS];
+                      return Icon ? <Icon className="w-4 h-4" /> : null;
+                    })()}
                   </a>
                 ))}
               </div>
@@ -163,7 +192,7 @@ export default function Footer() {
 
         {/* Section 7: Footer Bottom */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 text-center sm:text-left">
-          <p>? {new Date().getFullYear()} nagarments. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} nagarments. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">
               Privacy Policy
