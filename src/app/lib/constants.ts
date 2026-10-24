@@ -96,7 +96,7 @@ export const FOOTER_CUSTOMER: FooterLink[] = [
 export const SOCIAL_LINKS: SocialLink[] = [
   {
     platform: 'Facebook',
-    href: 'https://www.Facebook.com/',
+    href: 'https://www.facebook.com/Nagarmentss',
     ariaLabel: 'Facebook',
   },
   {
@@ -111,13 +111,17 @@ export const SOCIAL_LINKS: SocialLink[] = [
   },
   {
     platform: 'WhatsApp',
-    href: 'https://wa.me/250788000000',
+    href: 'https://wa.me/250781070569',
     ariaLabel: 'WhatsApp',
   },
 ];
 export const CONTACT_INFO = {
-  phoneDisplay: '+250781070569',
+  phoneDisplay: '0781070569 / 0785069455',
   phoneHref: 'tel:+250781070569',
+  phoneNumbers: [
+    { display: '0781070569', href: 'tel:+250781070569' },
+    { display: '0785069455', href: 'tel:+250785069455' },
+  ],
   emailDisplay: 'nagarmentss@gmail.com',
   emailHref: 'mailto:nagarmentss@gmail.com',
   locationDisplay: 'Batsinda Bus Park, Batsinda-Kagugu, Kigali, Rwanda',

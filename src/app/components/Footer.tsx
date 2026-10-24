@@ -37,7 +37,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed max-w-sm">
-              nagarments is Rwanda’s premier apparel manufacturer and bespoke tailoring studio. We produce tailored school uniforms, industrial workwear, and bespoke men’s fashion crafted for precision, fit, and endurance.
+              nagarments is Rwanda?s premier apparel manufacturer and bespoke tailoring studio. We produce tailored school uniforms, industrial workwear, and bespoke men?s fashion crafted for precision, fit, and endurance.
             </p>
             <div className="pt-2">
               <span className="inline-block text-xs font-semibold text-[#F28C28] uppercase tracking-widest bg-[#123B5D]/40 px-3 py-1 rounded border border-[#123B5D]">
@@ -91,15 +91,22 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3 text-xs sm:text-sm">
               <li>
-                <a
-                  href={CONTACT_INFO.phoneHref}
-                  className="flex items-center gap-2.5 text-gray-300 hover:text-[#F28C28] transition-colors group"
-                >
-                  <svg className="w-4 h-4 text-[#F28C28] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-start gap-2.5 text-gray-300">
+                  <svg className="w-4 h-4 text-[#F28C28] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <span className="break-all">{CONTACT_INFO.phoneDisplay}</span>
-                </a>
+                  <div className="flex flex-col gap-1">
+                    {CONTACT_INFO.phoneNumbers.map((phone) => (
+                      <a
+                        key={phone.href}
+                        href={phone.href}
+                        className="break-all hover:text-[#F28C28] transition-colors"
+                      >
+                        {phone.display}
+                      </a>
+                    ))}
+                  </div>
+                </div>
               </li>
               <li>
                 <a
@@ -156,7 +163,7 @@ export default function Footer() {
 
         {/* Section 7: Footer Bottom */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 text-center sm:text-left">
-          <p>© {new Date().getFullYear()} nagarments. All rights reserved.</p>
+          <p>? {new Date().getFullYear()} nagarments. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">
               Privacy Policy
