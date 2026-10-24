@@ -98,13 +98,20 @@ export default function ContactForm() {
       </div>
 
       <div className="mb-5 grid gap-2 border-y border-gray-100 py-4 text-sm sm:grid-cols-2">
-        <a
-          href={CONTACT_INFO.phoneHref}
-          className="flex min-w-0 items-start gap-2 text-gray-600 transition hover:text-[#F28C28]"
-        >
+        <div className="flex min-w-0 items-start gap-2 text-gray-600">
           <FiPhone className="mt-0.5 h-4 w-4 shrink-0 text-[#123B5D]" />
-          <span>{CONTACT_INFO.phoneDisplay}</span>
-        </a>
+          <div className="flex min-w-0 flex-col gap-1">
+            {CONTACT_INFO.phoneNumbers.map((phone) => (
+              <a
+                key={phone.href}
+                href={phone.href}
+                className="break-all transition hover:text-[#F28C28]"
+              >
+                {phone.display}
+              </a>
+            ))}
+          </div>
+        </div>
         <a
           href={CONTACT_INFO.emailHref}
           className="flex min-w-0 items-start gap-2 break-all text-gray-600 transition hover:text-[#F28C28]"

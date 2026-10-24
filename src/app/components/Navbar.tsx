@@ -287,12 +287,17 @@ export default function Navbar() {
         <div className="flex shrink-0 items-center gap-3 sm:gap-4">
           <CurrencySelector />
           <div className="hidden items-center gap-4 sm:flex">
-            <a
-              href={CONTACT_INFO.phoneHref}
-              className="transition-colors hover:text-[#F28C28]"
-            >
-              {CONTACT_INFO.phoneDisplay}
-            </a>
+            <div className="flex items-center gap-2 text-xs">
+              {CONTACT_INFO.phoneNumbers.map((phone) => (
+                <a
+                  key={phone.href}
+                  href={phone.href}
+                  className="transition-colors hover:text-[#F28C28]"
+                >
+                  {phone.display}
+                </a>
+              ))}
+            </div>
 
             <span aria-hidden="true" className="text-gray-600">
               |
@@ -694,13 +699,21 @@ export default function Navbar() {
           </nav>
 
           <div className="mt-4 space-y-3 border-t border-gray-800 pt-4">
-            <a
-              href={CONTACT_INFO.phoneHref}
-              className="flex items-center justify-center gap-2 py-2 text-xs text-[#EEF3F6]/80 transition hover:text-[#F28C28]"
-            >
-              <FiPhone className="h-4 w-4" />
-              Need help? {CONTACT_INFO.phoneDisplay}
-            </a>
+            <div className="flex items-start justify-center gap-2 py-2 text-xs text-[#EEF3F6]/80">
+              <FiPhone className="mt-0.5 h-4 w-4 shrink-0" />
+              <div className="flex flex-col items-center gap-1">
+                <span>Need help?</span>
+                {CONTACT_INFO.phoneNumbers.map((phone) => (
+                  <a
+                    key={phone.href}
+                    href={phone.href}
+                    className="transition hover:text-[#F28C28]"
+                  >
+                    {phone.display}
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
