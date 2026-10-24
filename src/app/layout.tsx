@@ -17,8 +17,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://nagarments.com"),
 
-  //Google verification
-
   verification: {
     google: "Yz1NIcyTZcDQqkS5kM2Zbjh2m_ShnXZ15QLFZzdUcq8",
   },
@@ -30,27 +28,39 @@ export const metadata: Metadata = {
 
   title: {
     template: "%s | nagarments",
-    default: "nagarments | Clothing Made for Work, School & Everyday Life",
+    default: "Tailor in Kigali, Rwanda | nagarments",
   },
 
   description:
-    "nagarments makes school uniforms, workwear, menâ€™s clothing, ready-to-wear garments, and custom clothing in Kigali, Rwanda.",
+    "Discover nagarments in Kigali, Rwanda, for custom clothing, school uniforms, medical and healthcare wear, corporate shirts, safety workwear, Kitenge and African print, dresses, traditional wear, and more.",
 
   keywords: [
     "nagarments",
-    "tailoring in Kigali",
-    "clothing in Kigali",
-    "school uniforms Rwanda",
-    "workwear Rwanda",
-    "men's clothing Rwanda",
+    "tailor in Kigali",
     "custom clothing Kigali",
-    "ready-to-wear clothing Rwanda",
+    "medical and healthcare wear Rwanda",
+    "T-shirts and polo shirts Rwanda",
+    "Kitenge and African print clothing",
+    "safety vests and field jackets",
+    "safety overalls and workwear",
+    "men's corporate and casual shirts",
+    "hoodies and sweaters",
+    "kids' clothing Rwanda",
+    "evening and party dresses",
+    "women's corporate and formal wear",
+    "graduation and ceremony dresses",
+    "caps and headwear",
+    "hospitality and culinary uniforms",
+    "engineering workwear",
+    "men's traditional wear and senator suits",
+    "school uniforms Rwanda",
+    "clothing in Kigali",
   ],
 
   openGraph: {
-    title: "nagarments | Clothing Made for Work, School & Everyday Life",
+    title: "Tailor in Kigali, Rwanda | nagarments",
     description:
-      "School uniforms, workwear, menâ€™s clothing, ready-to-wear garments, and custom clothing made in Kigali, Rwanda.",
+      "Explore custom clothing, school uniforms, healthcare apparel, corporate clothing, safety workwear, African print fashion, dresses, and traditional wear from nagarments in Kigali, Rwanda.",
     url: "https://nagarments.com",
     siteName: "nagarments",
     type: "website",
@@ -60,12 +70,19 @@ export const metadata: Metadata = {
         url: "/nagarments-logo.png",
         width: 1503,
         height: 670,
-        alt: "nagarments logo",
+        alt: "nagarments clothing and tailoring in Kigali, Rwanda",
       },
     ],
   },
-};
 
+  twitter: {
+    card: "summary_large_image",
+    title: "Tailor in Kigali, Rwanda | nagarments",
+    description:
+      "Custom clothing, uniforms, healthcare apparel, safety workwear, African print fashion, and more in Kigali, Rwanda.",
+    images: ["/nagarments-logo.png"],
+  },
+};
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
