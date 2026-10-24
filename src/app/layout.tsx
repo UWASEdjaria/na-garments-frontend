@@ -17,6 +17,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://nagarments.com"),
 
+  //Google verification
+
+  verification: {
+    google: "Yz1NIcyTZcDQqkS5kM2Zbjh2m_ShnXZ15QLFZzdUcq8",
+  },
+
   icons: {
     icon: "/icon.png",
     apple: "/apple-icon.png",
