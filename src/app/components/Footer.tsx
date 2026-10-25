@@ -192,7 +192,7 @@ export default function Footer() {
 
         {/* Section 7: Footer Bottom */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 text-center sm:text-left">
-          <p>© {new Date().getFullYear()} nagarments. All rights reserved.</p>
+          <p>? {new Date().getFullYear()} nagarments. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">
               Privacy Policy
