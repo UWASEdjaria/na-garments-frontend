@@ -1,5 +1,6 @@
-'use client';
+﻿'use client';
 
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { CONTACT_INFO, FOOTER_COLLECTIONS, FOOTER_PAGES, SOCIAL_LINKS } from '../lib/constants';
@@ -24,7 +25,7 @@ const SOCIAL_COLORS = {
   WhatsApp: 'bg-[#25D366]',
 };
 
-export default function Footer() {
+function FooterContent() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
@@ -208,5 +209,13 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+export default function Footer() {
+  return (
+    <Suspense fallback={null}>
+      <FooterContent />
+    </Suspense>
   );
 }

@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -8,6 +9,7 @@ import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
 import { api } from '@/app/lib/api';
 import { useCurrency } from '@/app/components/CurrencyProvider';
+
 
 interface OrderItem {
   id: string;
@@ -137,3 +139,4 @@ export default function OrdersPage() {
     </div>
   );
 }
+

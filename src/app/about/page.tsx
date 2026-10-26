@@ -1,9 +1,11 @@
+'use client';
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
 import { CONTACT_INFO } from '@/app/lib/constants';
 
-export const metadata = { title: 'About nagarments' };
 
 export default function AboutPage() {
   return (
