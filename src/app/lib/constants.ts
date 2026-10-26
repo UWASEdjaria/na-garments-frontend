@@ -73,8 +73,20 @@ export const WHY_CHOOSE_US: FeaturePillar[] = [
 
 export const FOOTER_COLLECTIONS: FooterLink[] = [
   { label: 'School Uniforms', href: '/shop?category=school-uniforms' },
-  { label: "Men's Fashion", href: '/shop?category=mens-fashion' },
-  { label: 'Engineering & Workwear', href: '/shop?category=engineering-workwear' },
+  { label: "Men's Traditional & Senator Suits", href: '/shop?category=mens-traditional-wear-senator-suits' },
+  { label: "Men's Corporate & Casual Shirts", href: '/shop?category=mens-shirts-corporate-casual-wear' },
+  { label: 'Workwear & Safety Overalls', href: '/shop?category=safety-overalls-workwear' },
+  { label: 'Safety Vests & Field Jackets', href: '/shop?category=safety-vests-field-jackets' },
+  { label: 'Medical & Healthcare Wear', href: '/shop?category=medical-healthcare-wear' },
+  { label: 'T-Shirts & Polo Shirts', href: '/shop?category=t-shirts-polo-shirts-lacoste' },
+  { label: 'Kitenge & African Print', href: '/shop?category=kitenge-african-print' },
+  { label: 'Hospitality & Culinary', href: '/shop?category=hospitality-culinary' },
+  { label: "Women's Corporate & Formal Wear", href: '/shop?category=womens-corporate-formal-wear' },
+  { label: 'Evening & Party Dresses', href: '/shop?category=evening-party-dresses' },
+  { label: 'Graduation & Ceremony Dresses', href: '/shop?category=graduation-ceremony-dresses' },
+  { label: 'Hoodies & Sweaters', href: '/shop?category=hoodies-sweaters' },
+  { label: 'Caps & Headwear', href: '/shop?category=caps-headwear' },
+  { label: "Kids' Clothing", href: '/shop?category=kids-clothing' },
 ];
 
 export const FOOTER_PAGES: FooterLink[] = [

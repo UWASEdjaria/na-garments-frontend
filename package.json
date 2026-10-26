@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
+    "@next/third-parties": "^16.4.3",
     "axios": "^1.20.0",
     "country-to-currency": "^3.0.1",
     "framer-motion": "^14.0.0",
