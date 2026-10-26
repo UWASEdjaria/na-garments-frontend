@@ -52,7 +52,11 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed max-w-sm">
+
+              nagarments is Rwanda?s premier apparel manufacturer and bespoke tailoring studio. We produce tailored school uniforms, industrial workwear, and bespoke men?s fashion crafted for precision, fit, and endurance.
+
               nagarments is Rwanda&apos;s premier apparel manufacturer and bespoke tailoring studio. We produce tailored school uniforms, industrial workwear, and bespoke men&apos;s fashion crafted for precision, fit, and endurance.
+
             </p>
             <div className="pt-2">
               <span className="inline-block text-xs font-semibold text-[#F28C28] uppercase tracking-widest bg-[#123B5D]/40 px-3 py-1 rounded border border-[#123B5D]">

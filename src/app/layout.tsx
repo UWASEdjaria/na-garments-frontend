@@ -4,6 +4,8 @@ import { ToastProvider } from '@/app/components/ToastProvider';
 import { CurrencyProvider } from '@/app/components/CurrencyProvider';
 import "./globals.css";
 
+import { GoogleAnalytics } from '@next/third-parties/google';
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -94,6 +96,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <CurrencyProvider>{children}</CurrencyProvider>
         </ToastProvider>
       </body>
+      <GoogleAnalytics gaId="G-94ZJDRSGXZ" />
     </html>
   );
 }
