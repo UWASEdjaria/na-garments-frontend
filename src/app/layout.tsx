@@ -69,9 +69,9 @@ export const metadata: Metadata = {
     locale: "en_RW",
     images: [
       {
-        url: "/nagarments-logo.png",
-        width: 1503,
-        height: 670,
+        url: "/nagarments-share.png",
+        width: 1200,
+        height: 630,
         alt: "nagarments clothing and tailoring in Kigali, Rwanda",
       },
     ],
@@ -82,7 +82,7 @@ export const metadata: Metadata = {
     title: "Tailor in Kigali, Rwanda | nagarments",
     description:
       "Custom clothing, uniforms, healthcare apparel, safety workwear, African print fashion, and more in Kigali, Rwanda.",
-    images: ["/nagarments-logo.png"],
+    images: ["/nagarments-share.png"],
   },
 };
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -100,3 +100,4 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     </html>
   );
 }
+
