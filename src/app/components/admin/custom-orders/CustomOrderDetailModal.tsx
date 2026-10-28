@@ -17,6 +17,14 @@ export default function CustomOrderDetailModal({ orderId, onClose }: CustomOrder
   const [order, setOrder] = useState<AdminCustomOrder | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [quoteTotal, setQuoteTotal] = useState('');
+  const [advanceAmount, setAdvanceAmount] = useState('');
+  const [deliveryFee, setDeliveryFee] = useState('0');
+  const [additionalCharges, setAdditionalCharges] = useState('0');
+  const [estimatedCompletionAt, setEstimatedCompletionAt] = useState('');
+  const [paymentTerms, setPaymentTerms] = useState('');
+  const [isSubmittingQuote, setIsSubmittingQuote] = useState(false);
+  const [quoteMessage, setQuoteMessage] = useState('');
 
   useEffect(() => {
     let isCurrentRequest = true;
@@ -39,6 +47,52 @@ export default function CustomOrderDetailModal({ orderId, onClose }: CustomOrder
     };
   }, [orderId]);
 
+  const handleProposeQuote = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrorMessage('');
+    setQuoteMessage('');
+
+    const total = Number(quoteTotal);
+    const advance = Number(advanceAmount);
+    const delivery = Number(deliveryFee);
+    const extra = Number(additionalCharges);
+
+    if (
+      !order ||
+      !Number.isFinite(total) ||
+      !Number.isFinite(advance) ||
+      !Number.isFinite(delivery) ||
+      !Number.isFinite(extra) ||
+      total <= 0 ||
+      advance < 0 ||
+      advance > total ||
+      delivery < 0 ||
+      extra < 0
+    ) {
+      setErrorMessage('Enter valid amounts. The advance cannot exceed the grand total.');
+      return;
+    }
+
+    setIsSubmittingQuote(true);
+
+    try {
+      const updatedOrder = await adminCustomOrderService.proposeQuote(order.id, {
+        quoteTotal: total,
+        advanceAmount: advance,
+        deliveryFee: delivery,
+        additionalCharges: extra,
+        estimatedCompletionAt: new Date(`${estimatedCompletionAt}T12:00:00`).toISOString(),
+        paymentTerms: paymentTerms.trim(),
+      });
+
+      setOrder(updatedOrder);
+      setQuoteMessage('Quote submitted. The customer quote email was requested.');
+    } catch (error: unknown) {
+      setErrorMessage(getApiErrorMessage(error instanceof Error ? error : new Error(String(error)), 'Unable to submit the quote.'));
+    } finally {
+      setIsSubmittingQuote(false);
+    }
+  };
   const detailRows = order ? [
     { label: 'Garment type', value: order.garmentType },
     { label: 'Quantity', value: String(order.quantity) },
@@ -122,6 +176,81 @@ export default function CustomOrderDetailModal({ orderId, onClose }: CustomOrder
             </>
           )}
 
+          {order && (
+            <section className="border-t border-gray-200 pt-5">
+              <h3 className="text-sm font-bold uppercase tracking-wide text-[#123B5D]">
+                Customer quote · RWF
+              </h3>
+              <p className="mt-2 text-xs leading-5 text-gray-600">
+                The grand total must already include delivery and additional charges.
+                Proposing the quote does not record a payment.
+              </p>
+
+              {order.quoteReference && (
+                <p className="mt-2 text-sm font-semibold text-[#123B5D]">
+                  Existing reference: {order.quoteReference} · {order.quoteStatus}
+                </p>
+              )}
+
+              <form onSubmit={handleProposeQuote} className="mt-4 space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Grand total (RWF)
+                    <input required type="number" min="1" step="1" value={quoteTotal}
+                      onChange={(event) => setQuoteTotal(event.target.value)}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" />
+                  </label>
+
+                  <label className="block text-sm font-medium text-gray-700">
+                    Advance payment (RWF)
+                    <input required type="number" min="0" step="1" value={advanceAmount}
+                      onChange={(event) => setAdvanceAmount(event.target.value)}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" />
+                  </label>
+
+                  <label className="block text-sm font-medium text-gray-700">
+                    Delivery fee (RWF)
+                    <input required type="number" min="0" step="1" value={deliveryFee}
+                      onChange={(event) => setDeliveryFee(event.target.value)}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" />
+                  </label>
+
+                  <label className="block text-sm font-medium text-gray-700">
+                    Additional charges (RWF)
+                    <input required type="number" min="0" step="1" value={additionalCharges}
+                      onChange={(event) => setAdditionalCharges(event.target.value)}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" />
+                  </label>
+
+                  <label className="block text-sm font-medium text-gray-700 sm:col-span-2">
+                    Estimated completion date
+                    <input required type="date" min={new Date().toISOString().slice(0, 10)}
+                      value={estimatedCompletionAt}
+                      onChange={(event) => setEstimatedCompletionAt(event.target.value)}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" />
+                  </label>
+
+                  <label className="block text-sm font-medium text-gray-700 sm:col-span-2">
+                    Payment terms
+                    <textarea required minLength={3} maxLength={2000} rows={3}
+                      value={paymentTerms}
+                      onChange={(event) => setPaymentTerms(event.target.value)}
+                      placeholder="Explain the advance, remaining balance, and when each is due."
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" />
+                  </label>
+                </div>
+
+                <button type="submit" disabled={isSubmittingQuote}
+                  className="rounded-md bg-[#123B5D] px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
+                  {isSubmittingQuote ? 'Submitting quote...' : 'Propose quote and email customer'}
+                </button>
+
+                {quoteMessage && (
+                  <p role="status" className="text-sm text-green-700">{quoteMessage}</p>
+                )}
+              </form>
+            </section>
+          )}
           <div className="border-t border-gray-100 pt-4 text-right">
             <button type="button" onClick={onClose} className="rounded-md bg-[#123B5D] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#F28C28] hover:text-[#111111]">Close</button>
           </div>

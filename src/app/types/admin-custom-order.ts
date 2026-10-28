@@ -1,4 +1,4 @@
-export type CustomOrderStatus =
+﻿export type CustomOrderStatus =
   | 'PENDING'
   | 'CONFIRMED'
   | 'PROCESSING'
@@ -30,10 +30,27 @@ export interface AdminCustomOrder {
   paymentStatus: CustomOrderPaymentStatus;
   adminNotes: string | null;
   createdAt: string;
+  quoteReference: string | null;
+  quoteStatus: 'PENDING' | 'PROPOSED' | 'ACCEPTED' | 'DECLINED';
+  quoteTotal: number | null;
+  advanceAmount: number | null;
+  deliveryFee: number | null;
+  additionalCharges: number | null;
+  balanceAmount: number | null;
+  estimatedCompletionAt: string | null;
+  paymentTerms: string | null;
   updatedAt: string;
 }
 
 export interface UpdateCustomOrderStatusData {
   status: CustomOrderStatus;
   adminNotes?: string;
+}
+export interface ProposeCustomOrderQuoteData {
+  quoteTotal: number;
+  advanceAmount: number;
+  deliveryFee: number;
+  additionalCharges: number;
+  estimatedCompletionAt: string;
+  paymentTerms: string;
 }
