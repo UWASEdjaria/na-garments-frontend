@@ -36,6 +36,7 @@ export default function ProductDetailsPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
 
 
     useEffect(() => {
@@ -105,17 +106,23 @@ export default function ProductDetailsPage() {
   };
 
   const handleAddToCart = async () => {
-    if (!product) return;
+    if (!product || !product.isAvailable || product.stockQuantity <= 0) return;
+
+    if (isAddedToCart) {
+      window.location.assign('/cart');
+      return;
+    }
 
     setIsAddingToCart(true);
 
     try {
       await cartService.addToCart(product, quantity);
+      setIsAddedToCart(true);
 
       showToast({
         type: 'success',
         title: 'Added to cart',
-        description: `${quantity} × ${product.name} added to your cart.`,
+        description: `${quantity} × ${product.name} added to your cart. Select View Cart to continue.`,
       });
     } catch {
       showToast({
@@ -340,7 +347,7 @@ export default function ProductDetailsPage() {
                       className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-[#F28C28] px-6 text-sm font-extrabold text-[#111111] transition-all hover:bg-[#123B5D] hover:text-white disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
                     >
                       <FiShoppingBag aria-hidden="true" className="h-5 w-5" />
-                      {isAddingToCart ? 'Adding...' : isInStock ? 'Add to Cart' : 'Out of Stock'}
+                      {isAddingToCart ? 'Adding...' : !isInStock ? 'Out of Stock' : isAddedToCart ? 'View Cart' : 'Add to Cart'}
                     </button>
                   </div>
 

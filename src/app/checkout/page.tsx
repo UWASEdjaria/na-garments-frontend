@@ -22,7 +22,25 @@ interface OrderResponse {
 interface PaymentResponse {
   success: boolean;
   message: string;
-  data: { paymentId: string; status: string };
+  data: {
+    paymentId: string;
+    orderId?: string;
+    amount?: number;
+    paymentMethod?: string;
+    provider?: string | null;
+    status: string;
+    ref?: string | null;
+    retryAvailable?: boolean;
+    attempts?: Array<{
+      paymentId: string;
+      amount: number;
+      paymentMethod: string;
+      provider?: string | null;
+      status: string;
+      ref: string;
+      createdAt: string;
+    }>;
+  };
 }
 
 export default function CheckoutPage() {

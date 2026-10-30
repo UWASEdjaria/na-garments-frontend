@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import {
   Suspense,
@@ -248,16 +248,19 @@ function ShopContent() {
   };
 
   const handleAddToCart = async (product: Product) => {
+    if (addedProductId === product.id) {
+      window.location.assign('/cart');
+      return;
+    }
+
     try {
       await cartService.addToCart(product);
-
       setAddedProductId(product.id);
-      setTimeout(() => setAddedProductId(null), 1800);
 
       showToast({
         type: 'success',
         title: 'Added to cart',
-        description: `${product.name} was added to your cart.`,
+        description: `${product.name} was added to your cart. Select View Cart to continue.`,
       });
     } catch {
       showToast({
@@ -654,7 +657,12 @@ function ShopContent() {
                                   </span>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-1.5">
+                                                                {isOutOfStock && (
+                                  <p className="mb-2 text-xs font-medium text-red-600">
+                                    This item is currently unavailable. Please check back soon.
+                                  </p>
+                                )}
+<div className="grid grid-cols-2 gap-1.5">
                                   <Link
                                     href={`/shop/${product.id}`}
                                     className="w-full min-w-0 whitespace-nowrap bg-[#EEF3F6] text-[#123B5D] hover:bg-[#123B5D] hover:text-white font-semibold text-[11px] sm:text-xs leading-tight px-1 py-1 rounded-lg text-center transition-all duration-200 flex items-center justify-center min-h-[40px]"
@@ -673,9 +681,7 @@ function ShopContent() {
                                           : 'bg-[#F28C28] text-[#111111] hover:bg-[#123B5D] hover:text-white shadow-sm'
                                     }`}
                                   >
-                                    {addedProductId === product.id
-                                      ? 'âœ“ Added'
-                                      : 'Add to Cart'}
+                                    {isOutOfStock ? 'Out of Stock' : addedProductId === product.id ? 'View Cart' : 'Add to Cart'}
                                   </button>
                                 </div>
                               </>

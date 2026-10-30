@@ -27,7 +27,10 @@ export default function CustomOrderTable({
                 Quantity
               </th>
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Status
+                Order Status
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold">
+                Quote Status
               </th>
               <th className="px-6 py-4 text-left text-sm font-semibold">
                 Payment
@@ -68,6 +71,21 @@ export default function CustomOrderTable({
                     {order.status.replaceAll('_', ' ')}
                   </span>
                 </td>
+                <td className="px-6 py-4">
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${
+                      order.quoteStatus === 'ACCEPTED'
+                        ? 'bg-green-100 text-green-700'
+                        : order.quoteStatus === 'DECLINED'
+                          ? 'bg-red-100 text-red-700'
+                          : order.quoteStatus === 'PROPOSED'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    {order.quoteStatus.replaceAll('_', ' ')}
+                  </span>
+                </td>
 
                 <td className="px-6 py-4 text-sm text-gray-700">
                   {order.paymentStatus}
@@ -93,7 +111,7 @@ export default function CustomOrderTable({
             {orders.length === 0 && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   className="px-6 py-12 text-center text-gray-500"
                 >
                   No custom orders found.

@@ -19,6 +19,33 @@ const toFormData = (data: ProductMutationData): FormData => {
   return formData;
 };
 
+const toUpdateFormData = (data: Partial<ProductMutationData>): FormData => {
+  const formData = new FormData();
+
+  if (data.name !== undefined) formData.append('name', data.name);
+  if (data.slug !== undefined) formData.append('slug', data.slug);
+  if (data.description !== undefined) formData.append('description', data.description);
+  if (data.price !== undefined) {
+    formData.append('price', data.price === null ? '' : String(data.price));
+  }
+  if (data.categoryId !== undefined) formData.append('categoryId', data.categoryId);
+  if (data.minimumStockLevel !== undefined) {
+    formData.append('minimumStockLevel', String(data.minimumStockLevel));
+  }
+  if (data.maximumStockLevel !== undefined) {
+    formData.append('maximumStockLevel', String(data.maximumStockLevel));
+  }
+  if (data.sizes !== undefined) formData.append('sizes', JSON.stringify(data.sizes));
+  if (data.colors !== undefined) formData.append('colors', JSON.stringify(data.colors));
+  if (data.isAvailable !== undefined) {
+    formData.append('isAvailable', String(data.isAvailable));
+  }
+  if (data.productType !== undefined) formData.append('productType', data.productType);
+  if (data.imageUrl !== undefined) formData.append('imageUrl', data.imageUrl);
+  if (data.image !== undefined) formData.append('image', data.image);
+
+  return formData;
+};
 export const productService = {
   /**
    * Fetches products using central Axios client
@@ -70,8 +97,8 @@ export const productService = {
     return response.data;
   },
 
-  async updateProduct(id: string, data: ProductMutationData): Promise<Product> {
-    const response = await api.put<Product>(`/products/${id}`, toFormData(data), {
+  async updateProduct(id: string, data: Partial<ProductMutationData>): Promise<Product> {
+    const response = await api.put<Product>(`/products/${id}`, toUpdateFormData(data), {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;

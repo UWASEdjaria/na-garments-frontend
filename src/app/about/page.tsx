@@ -32,11 +32,21 @@ export default function AboutPage() {
           <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
             {[
               'School uniforms for institutions across Rwanda',
-              'Industrial and engineering workwear',
-              'Corporate and security uniforms',
-              "Men's fashion and everyday clothing",
-              'Ready-to-wear garments available for immediate purchase',
-              'Made-to-order designs tailored to your exact requirements',
+              "Men's shirts (corporate & casual wear)",
+              'Medical & healthcare wear',
+              'T-shirts & polo shirts (Lacoste)',
+              'Kitenge & African print',
+              'Safety vests & field jackets',
+              'Safety overalls & workwear',
+              'Hoodies & sweaters',
+              "Kids' clothing",
+              'Evening & party dresses',
+              "Women's corporate & formal wear",
+              'Graduation & ceremony dresses',
+              'Caps & headwear',
+              'Hospitality & culinary',
+              'Engineering & workwear',
+              "Men's traditional wear & senator suits",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2">
                 <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-[#F28C28] text-[#111111] flex items-center justify-center text-[10px] font-bold">✓</span>
