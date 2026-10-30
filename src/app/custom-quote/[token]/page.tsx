@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -85,6 +85,8 @@ export default function CustomerQuotePage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [decisionMessage, setDecisionMessage] = useState('');
   const [decisionStatus, setDecisionStatus] = useState('');
+  const [pendingDecision, setPendingDecision] = useState<boolean | null>(null);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -130,11 +132,6 @@ export default function CustomerQuotePage() {
       return;
     }
 
-    const confirmation = accepted
-      ? 'Do you want to accept this quote?'
-      : 'Do you want to decline this quote?';
-
-    if (!window.confirm(confirmation)) return;
 
     setSubmitting(true);
     setErrorMessage('');
@@ -148,21 +145,23 @@ export default function CustomerQuotePage() {
 
       const result = response.data;
       setDecisionStatus(result.quoteStatus);
+      setPendingDecision(null);
       setQuote((current) =>
         current ? { ...current, quoteStatus: result.quoteStatus } : current
       );
-      setDecisionMessage(
+      const message =
         result.quoteStatus === 'ACCEPTED'
           ? 'You accepted this quote. Nagarments can now follow up about the next steps. No payment has been made through this page.'
-          : 'You declined this quote. Contact Nagarments if you would like to discuss another option.'
-      );
+          : 'You declined this quote. Contact Nagarments if you would like to discuss another option.';
+      setDecisionMessage(message);
+      setToast({ type: 'success', message });
     } catch (error: unknown) {
-      setErrorMessage(
-        getErrorMessage(
-          error,
-          'We could not record your decision. The quote may have expired or already been decided.'
-        )
+      const message = getErrorMessage(
+        error,
+        'We could not record your decision. The quote may have expired or already been decided.'
       );
+      setErrorMessage(message);
+      setToast({ type: 'error', message });
     } finally {
       setSubmitting(false);
     }
@@ -309,7 +308,7 @@ export default function CustomerQuotePage() {
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <button
                     type="button"
-                    onClick={() => void submitDecision(true)}
+                    onClick={() => setPendingDecision(true)}
                     disabled={submitting}
                     className="min-h-12 flex-1 rounded-lg bg-[#123B5D] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#0d2d47] disabled:cursor-not-allowed disabled:opacity-60"
                   >
@@ -317,7 +316,7 @@ export default function CustomerQuotePage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => void submitDecision(false)}
+                    onClick={() => setPendingDecision(false)}
                     disabled={submitting}
                     className="min-h-12 flex-1 rounded-lg border border-gray-300 px-5 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
@@ -341,6 +340,67 @@ export default function CustomerQuotePage() {
       </main>
 
       <Footer />
+
+      {pendingDecision !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="presentation">
+          <section
+            aria-labelledby="quote-confirm-title"
+            aria-modal="true"
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+            role="dialog"
+          >
+            <p className="text-sm font-bold uppercase tracking-widest text-[#F28C28]">nagarments</p>
+            <h2 id="quote-confirm-title" className="mt-2 text-xl font-extrabold text-[#123B5D]">
+              {pendingDecision ? 'Accept this quote?' : 'Decline this quote?'}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-gray-600">
+              {pendingDecision
+                ? 'Please confirm that you want to accept this custom clothing quote.'
+                : 'Are you sure you want to decline this custom clothing quote?'}
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => setPendingDecision(null)}
+                className="min-h-11 flex-1 rounded-lg border border-gray-300 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => void submitDecision(pendingDecision)}
+                className="min-h-11 flex-1 rounded-lg bg-[#123B5D] px-4 py-3 text-sm font-bold text-white hover:bg-[#0d2d47] disabled:opacity-60"
+              >
+                {submitting ? 'Submitting…' : pendingDecision ? 'Yes, accept' : 'Yes, decline'}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {toast && (
+        <div
+          className={`fixed right-4 top-4 z-[60] flex max-w-sm items-start gap-3 rounded-xl border p-4 shadow-xl ${
+            toast.type === 'success'
+              ? 'border-green-200 bg-green-50 text-green-900'
+              : 'border-red-200 bg-red-50 text-red-900'
+          }`}
+          role={toast.type === 'error' ? 'alert' : 'status'}
+        >
+          <span className="font-bold">{toast.type === 'success' ? 'Success' : 'Error'}</span>
+          <p className="flex-1 text-sm">{toast.message}</p>
+          <button
+            type="button"
+            aria-label="Dismiss notification"
+            onClick={() => setToast(null)}
+            className="font-bold"
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 }
