@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/app/lib/api';
@@ -21,9 +21,52 @@ type CustomerQuote = {
   quoteStatus: string;
 };
 
+
 type QuoteDecision = {
-  quoteReference: string | null;
   quoteStatus: string;
+};
+
+type CustomQuotePaymentStatus = {
+  customOrderId: string;
+  quoteReference: string | null;
+  quoteStatus: 'PROPOSED' | 'ACCEPTED';
+  paymentStatus: string;
+  quoteTotal: number;
+  advanceAmount: number;
+  advancePaidAmount: number;
+  balanceAmount: number;
+  payments: Array<{
+    paymentId: string;
+    amount: number;
+    status: string;
+    ref: string;
+    createdAt: string;
+  }>;
+};
+
+type CustomQuotePaymentStatusResponse = {
+  success: boolean;
+  message: string;
+  data: CustomQuotePaymentStatus;
+};
+
+type CustomQuotePaymentResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    paymentId: string;
+    customOrderId: string;
+    quoteReference: string | null;
+    amount: number;
+    paymentMethod: 'MOMO';
+    provider: 'PAYPACK';
+    status: string;
+    ref: string;
+    quoteTotal: number;
+    advanceAmount: number;
+    advancePaidAmount: number;
+    balanceAmount: number;
+  };
 };
 
 function formatRwf(value: number | null): string {
@@ -87,6 +130,12 @@ export default function CustomerQuotePage() {
   const [decisionStatus, setDecisionStatus] = useState('');
   const [pendingDecision, setPendingDecision] = useState<boolean | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [paymentInfo, setPaymentInfo] = useState<CustomQuotePaymentStatus | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [paymentSubmitting, setPaymentSubmitting] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
+  const [paymentMessage, setPaymentMessage] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -127,6 +176,93 @@ export default function CustomerQuotePage() {
     };
   }, [token]);
 
+  const loadPaymentStatus = useCallback(async () => {
+    if (!token) return;
+
+    setPaymentLoading(true);
+    setPaymentError('');
+
+    try {
+      const response = await api.get<CustomQuotePaymentStatusResponse>(
+        `/payments/custom-quote/${encodeURIComponent(token)}`
+      );
+
+      const paymentData = response.data.data;
+      setPaymentInfo(paymentData);
+
+      setQuote((current) =>
+        current
+          ? { ...current, balanceAmount: paymentData.balanceAmount }
+          : current
+      );
+    } catch (error: unknown) {
+      setPaymentError(
+        getErrorMessage(
+          error,
+          'Could not load payment status. Please refresh the page.'
+        )
+      );
+    } finally {
+      setPaymentLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (quote?.quoteStatus === 'ACCEPTED') {
+      void loadPaymentStatus();
+    }
+  }, [quote?.quoteStatus, loadPaymentStatus]);
+
+  async function submitCustomQuotePayment() {
+    if (!token || !phoneNumber.trim() || paymentSubmitting || !paymentInfo) {
+      return;
+    }
+
+    const hasPendingPayment = paymentInfo.payments.some(
+      (payment) => payment.status === 'PENDING'
+    );
+
+    if (hasPendingPayment) {
+      setPaymentError(
+        'A payment is already pending. Please wait for its status to update.'
+      );
+      return;
+    }
+
+    if (paymentInfo.advanceAmount <= paymentInfo.advancePaidAmount) {
+      setPaymentError('There is no outstanding advance payment.');
+      return;
+    }
+
+    setPaymentSubmitting(true);
+    setPaymentError('');
+    setPaymentMessage('');
+
+    try {
+      const response = await api.post<CustomQuotePaymentResponse>(
+        `/payments/custom-quote/${encodeURIComponent(token)}/initiate`,
+        { phoneNumber: phoneNumber.trim() }
+      );
+
+      setPaymentMessage(
+        response.data.message ||
+        'Payment request submitted. Check your phone for the Mobile Money prompt.'
+      );
+
+      await loadPaymentStatus();
+    } catch (error: unknown) {
+      setPaymentError(
+        getErrorMessage(
+          error,
+          'Could not start the payment. Please check your number and try again.'
+        )
+      );
+
+      await loadPaymentStatus();
+    } finally {
+      setPaymentSubmitting(false);
+    }
+  }
   async function submitDecision(accepted: boolean) {
     if (!token || submitting || !quote || quote.quoteStatus !== 'PROPOSED') {
       return;
@@ -151,7 +287,7 @@ export default function CustomerQuotePage() {
       );
       const message =
         result.quoteStatus === 'ACCEPTED'
-          ? 'You accepted this quote. Nagarments can now follow up about the next steps. No payment has been made through this page.'
+          ? 'You accepted this quote. You can now pay the requested advance below. No payment has been made yet.'
           : 'You declined this quote. Contact Nagarments if you would like to discuss another option.';
       setDecisionMessage(message);
       setToast({ type: 'success', message });
@@ -291,10 +427,185 @@ export default function CustomerQuotePage() {
                 </p>
               )}
 
-              {decisionMessage && (
-                <p className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-900" role="status">
-                  {decisionMessage}
-                </p>
+              {quote.quoteStatus === 'ACCEPTED' && (
+                <section className="mt-6 rounded-xl border border-[#123B5D]/20 bg-white p-5">
+                  <h2 className="text-lg font-extrabold text-[#123B5D]">
+                    Pay your advance
+                  </h2>
+
+                  <p className="mt-2 text-sm leading-6 text-gray-600">
+                    Your quote is accepted. Enter your Rwanda Mobile Money
+                    number below to request the advance payment.
+                  </p>
+
+                  {paymentLoading && (
+                    <p className="mt-3 text-sm text-gray-600" role="status">
+                      Loading payment status...
+                    </p>
+                  )}
+
+                  {paymentInfo && (
+                    <dl className="mt-4 space-y-3 rounded-lg bg-[#EEF3F6] p-4">
+                      <div className="flex justify-between gap-3 text-sm">
+                        <dt className="text-gray-600">Advance requested</dt>
+                        <dd className="font-semibold">
+                          {formatRwf(paymentInfo.advanceAmount)}
+                        </dd>
+                      </div>
+
+                      <div className="flex justify-between gap-3 text-sm">
+                        <dt className="text-gray-600">Advance paid</dt>
+                        <dd className="font-semibold">
+                          {formatRwf(paymentInfo.advancePaidAmount)}
+                        </dd>
+                      </div>
+
+                      <div className="flex justify-between gap-3 text-sm">
+                        <dt className="font-bold text-[#123B5D]">
+                          Advance still due
+                        </dt>
+                        <dd className="font-extrabold text-[#123B5D]">
+                          {formatRwf(
+                            Math.max(
+                              0,
+                              paymentInfo.advanceAmount -
+                                paymentInfo.advancePaidAmount
+                            )
+                          )}
+                        </dd>
+                      </div>
+
+                      <div className="flex justify-between gap-3 border-t border-gray-200 pt-3 text-sm">
+                        <dt className="text-gray-600">
+                          Order balance remaining
+                        </dt>
+                        <dd className="font-bold">
+                          {formatRwf(paymentInfo.balanceAmount)}
+                        </dd>
+                      </div>
+
+                      <div className="flex justify-between gap-3 text-sm">
+                        <dt className="text-gray-600">Payment status</dt>
+                        <dd className="font-bold">
+                          {paymentInfo.paymentStatus}
+                        </dd>
+                      </div>
+                    </dl>
+                  )}
+
+                  {paymentInfo && paymentInfo.payments.length > 0 && (
+                    <div className="mt-4">
+                      <h3 className="text-sm font-bold text-[#123B5D]">
+                        Payment attempts
+                      </h3>
+
+                      <ul className="mt-2 space-y-2">
+                        {paymentInfo.payments.map((payment) => (
+                          <li
+                            key={payment.paymentId}
+                            className="flex flex-wrap justify-between gap-2 rounded-lg border border-gray-200 p-3 text-sm"
+                          >
+                            <span>{formatRwf(payment.amount)}</span>
+                            <span className="font-semibold">
+                              {payment.status}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {paymentError && (
+                    <p
+                      className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+                      role="alert"
+                    >
+                      {paymentError}
+                    </p>
+                  )}
+
+                  {paymentMessage && (
+                    <p
+                      className="mt-4 rounded-lg bg-green-50 p-3 text-sm text-green-900"
+                      role="status"
+                    >
+                      {paymentMessage}
+                    </p>
+                  )}
+
+                  {(!paymentInfo ||
+                    paymentInfo.advanceAmount > paymentInfo.advancePaidAmount) && (
+                    <form
+                      className="mt-5 space-y-3"
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        void submitCustomQuotePayment();
+                      }}
+                    >
+                      <label
+                        htmlFor="quote-payment-phone"
+                        className="block text-sm font-semibold text-gray-700"
+                      >
+                        Mobile Money phone number
+                      </label>
+
+                      <input
+                        id="quote-payment-phone"
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        required
+                        value={phoneNumber}
+                        onChange={(event) => setPhoneNumber(event.target.value)}
+                        placeholder="e.g. 078XXXXXXX"
+                        className="min-h-12 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-[#123B5D] focus:ring-2 focus:ring-[#123B5D]/15"
+                      />
+
+                      <button
+                        type="submit"
+                        disabled={
+                          !paymentInfo ||
+                          paymentLoading ||
+                          paymentSubmitting ||
+                          paymentInfo.payments.some(
+                            (payment) => payment.status === 'PENDING'
+                          )
+                        }
+                        className="min-h-12 w-full rounded-lg bg-[#123B5D] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#0d2d47] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {paymentSubmitting
+                          ? 'Requesting payment...'
+                          : paymentInfo?.payments.some(
+                                (payment) => payment.status === 'PENDING'
+                              )
+                            ? 'Payment pending'
+                            : 'Pay Advance'}
+                      </button>
+
+                      <p className="text-xs leading-5 text-gray-500">
+                        A Mobile Money payment request will be initiated.
+                        Check the amount and merchant details on your phone
+                        before approving it.
+                      </p>
+                    </form>
+                  )}
+
+                  {paymentInfo &&
+                    paymentInfo.advanceAmount <= paymentInfo.advancePaidAmount && (
+                      <p className="mt-4 rounded-lg bg-green-50 p-3 text-sm font-semibold text-green-900">
+                        The requested advance has been paid.
+                      </p>
+                    )}
+
+                  <button
+                    type="button"
+                    onClick={() => void loadPaymentStatus()}
+                    disabled={paymentLoading}
+                    className="mt-4 text-sm font-bold text-[#123B5D] underline underline-offset-4 disabled:opacity-50"
+                  >
+                    Refresh payment status
+                  </button>
+                </section>
               )}
 
               {!canDecide && !decisionMessage && (

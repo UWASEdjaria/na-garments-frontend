@@ -59,6 +59,40 @@ export default function CheckoutPage() {
   const [rwfTotal, setRwfTotal] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [paymentStatus, setPaymentStatus] = useState('PENDING');
+  const [retryAvailable, setRetryAvailable] = useState(false);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const [statusCheckError, setStatusCheckError] = useState('');
+
+  const checkPaymentStatus = useCallback(async () => {
+    if (!orderId) return;
+
+    setIsCheckingStatus(true);
+    setStatusCheckError('');
+
+    try {
+      const endpoint = isGuest
+        ? `/payments/guest/order/${encodeURIComponent(orderId)}?email=${encodeURIComponent(guestEmail.trim())}`
+        : `/payments/order/${encodeURIComponent(orderId)}`;
+
+      const res = await api.get<PaymentResponse>(endpoint);
+
+      if (!res.data.success) {
+        throw new Error(res.data.message || 'Could not check payment status.');
+      }
+
+      setPaymentStatus(res.data.data.status.toUpperCase());
+      setRetryAvailable(Boolean(res.data.data.retryAvailable));
+    } catch (err: unknown) {
+      setStatusCheckError(
+        err instanceof Error
+          ? err.message
+          : 'Unable to check payment status. Please try again.'
+      );
+    } finally {
+      setIsCheckingStatus(false);
+    }
+  }, [orderId, isGuest, guestEmail]);
 
   const loadCart = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -163,6 +197,9 @@ export default function CheckoutPage() {
         : await api.post<PaymentResponse>('/payments/initiate', payload);
 
       if (res.data.success) {
+        setPaymentStatus(res.data.data.status.toUpperCase());
+        setRetryAvailable(Boolean(res.data.data.retryAvailable));
+        setStatusCheckError('');
         setStep('done');
       } else {
         setError(res.data.message || 'Payment initiation failed.');
@@ -174,6 +211,20 @@ export default function CheckoutPage() {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (step !== 'done' || paymentStatus !== 'PENDING') {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      if (!isCheckingStatus) {
+        void checkPaymentStatus();
+      }
+    }, 5000);
+
+    return () => window.clearInterval(timer);
+  }, [step, paymentStatus, isCheckingStatus, checkPaymentStatus]);
 
   if (isLoading) {
     return (
@@ -341,27 +392,108 @@ export default function CheckoutPage() {
         {/* Step: Done */}
         {step === 'done' && (
           <div className="rounded-xl bg-white border border-gray-200 p-10 shadow-sm text-center space-y-4">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600 text-2xl">✓</div>
-            <h2 className="text-xl font-extrabold text-[#123B5D]">Payment prompt sent!</h2>
+            <div
+              className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full text-2xl font-bold ${
+                ['PAID', 'SUCCESSFUL'].includes(paymentStatus)
+                  ? 'bg-green-100 text-green-600'
+                  : paymentStatus === 'PENDING'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-red-100 text-red-600'
+              }`}
+            >
+              {['PAID', 'SUCCESSFUL'].includes(paymentStatus)
+                ? '✓'
+                : paymentStatus === 'PENDING'
+                  ? '…'
+                  : '!'}
+            </div>
+
+            <h2 className="text-xl font-extrabold text-[#123B5D]">
+              {['PAID', 'SUCCESSFUL'].includes(paymentStatus)
+                ? 'Payment successful!'
+                : paymentStatus === 'PENDING'
+                  ? 'Payment pending'
+                  : paymentStatus === 'REFUNDED'
+                    ? 'Payment refunded'
+                    : paymentStatus === 'CANCELLED'
+                      ? 'Payment cancelled'
+                      : paymentStatus === 'FAILED'
+                        ? 'Payment failed'
+                        : 'Payment status unavailable'}
+            </h2>
+
             <p className="text-sm text-gray-600">
-              Check your phone and approve the Mobile Money prompt to complete your payment.
-              Your order will be confirmed once payment is received.
+              {['PAID', 'SUCCESSFUL'].includes(paymentStatus)
+                ? 'Your payment has been confirmed. Thank you for your order!'
+                : paymentStatus === 'PENDING'
+                  ? 'Check your phone and approve the Mobile Money prompt. We are checking your payment status automatically.'
+                  : paymentStatus === 'REFUNDED'
+                    ? 'This payment has been refunded. Please contact us if you need help with your order.'
+                    : paymentStatus === 'CANCELLED'
+                      ? 'This payment was cancelled. You can try again if another payment attempt is available.'
+                      : paymentStatus === 'FAILED'
+                        ? 'The payment was not completed. You can try again if another payment attempt is available.'
+                        : 'We could not confirm the payment status. Please check again or contact us for assistance.'}
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-              {isGuest ? (
-                <div className="rounded-lg bg-[#EEF3F6] p-4 text-sm text-gray-700">
-                  <p className="font-bold text-[#123B5D]">Your order reference</p>
-                  <p className="mt-1 break-all font-mono">{orderId}</p>
-                  <p className="mt-2">
-                    Please save this reference for your records.
-                  </p>
-                </div>
-              ) : (
-                <Link href="/account/orders" className="rounded-lg bg-[#F28C28] px-6py-3 text-sm font-extrabold text-[#111111] hover:bg-[#123B5D] hover:text-white transition-colors">
-                  View My Orders
-                </Link>
-              )}
-              <Link href="/shop" className="rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-[#123B5D] hover:bg-[#EEF3F6] transition-colors">
+
+            {statusCheckError && (
+              <p className="text-sm text-red-600" role="alert">
+                {statusCheckError}
+              </p>
+            )}
+
+            {paymentStatus === 'PENDING' && (
+              <button
+                type="button"
+                onClick={() => void checkPaymentStatus()}
+                disabled={isCheckingStatus}
+                className="rounded-lg border border-[#123B5D] px-6 py-3 text-sm font-semibold text-[#123B5D] hover:bg-[#EEF3F6] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isCheckingStatus ? 'Checking payment...' : 'Check Payment Status'}
+              </button>
+            )}
+
+            {['FAILED', 'CANCELLED'].includes(paymentStatus) && retryAvailable && (
+              <div className="flex flex-col sm:flex-row justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => void handleInitiatePayment()}
+                  disabled={isSubmitting || !phone.trim()}
+                  className="rounded-lg bg-[#F28C28] px-6 py-3 text-sm font-extrabold text-[#111111] hover:bg-[#123B5D] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isSubmitting ? 'Sending prompt...' : 'Retry Payment'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setStep('payment')}
+                  className="rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-[#123B5D] hover:bg-[#EEF3F6]"
+                >
+                  Change Phone Number
+                </button>
+              </div>
+            )}
+
+            {isGuest ? (
+              <div className="rounded-lg bg-[#EEF3F6] p-4 text-sm text-gray-700">
+                <p className="font-bold text-[#123B5D]">Your order reference</p>
+                <p className="mt-1 break-all font-mono">{orderId}</p>
+                <p className="mt-2">Please save this reference for your records.</p>
+              </div>
+            ) : (
+              <Link
+                href="/account/orders"
+                className="inline-block rounded-lg bg-[#F28C28] px-6 py-3 text-sm font-extrabold text-[#111111] hover:bg-[#123B5D] hover:text-white transition-colors"
+              >
+                View My Orders
+              </Link>
+            )}
+
+            <div className="pt-2">
+              <Link
+                href="/shop"
+                className="inline-block rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-[#123B5D] hover:bg-[#EEF3F6]"
+              >
                 Continue Shopping
               </Link>
             </div>
