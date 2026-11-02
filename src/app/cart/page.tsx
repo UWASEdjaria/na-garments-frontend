@@ -4,6 +4,8 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import useAuth from '@/app/hooks/useAuth';
 import { FiMinus, FiPlus, FiTrash2, FiShoppingBag, FiArrowLeft } from 'react-icons/fi';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
@@ -14,20 +16,43 @@ import { useCurrency } from '@/app/components/CurrencyProvider';
 import { useToast } from '@/app/components/ToastProvider';
 import type { CartItem } from '@/app/types';
 
+
 export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const { format } = useCurrency();
   const { showToast } = useToast();
 
   const loadCart = useCallback(async () => {
     setIsLoading(true);
-    const cart = await cartService.getCart();
-    setItems(cart);
-    setIsLoading(false);
-  }, []);
 
-  useEffect(() => { void loadCart(); }, [loadCart]);
+    try {
+      const cart = await cartService.getCart();
+      setItems(cart);
+    } catch {
+      setItems([]);
+      showToast({
+        type: 'error',
+        title: 'Could not load cart',
+        description: 'Please check your connection and try again.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [showToast]);
+
+  useEffect(() => {
+    if (isAuthLoading) return;
+
+    if (user?.role === 'ADMIN') {
+      router.replace('/admin/custom-orders');
+      return;
+    }
+
+    void loadCart();
+  }, [isAuthLoading, user?.role, router, loadCart]);
 
   const updateQuantity = async (item: CartItem, delta: number) => {
     const newQty = item.quantity + delta;
@@ -38,6 +63,7 @@ export default function CartPage() {
 
       if (token && item.id && !item.id.startsWith('local-')) {
         await api.put(`/cart/items/${item.id}`, { quantity: newQty });
+        window.dispatchEvent(new Event('cart_updated'));
         await loadCart();
       } else {
         const stored = cartService.getLocalCart();
@@ -74,6 +100,7 @@ export default function CartPage() {
 
       if (token && item.id && !item.id.startsWith('local-')) {
         await api.delete(`/cart/items/${item.id}`);
+        window.dispatchEvent(new Event('cart_updated'));
         await loadCart();
       } else {
         const stored = cartService.getLocalCart();

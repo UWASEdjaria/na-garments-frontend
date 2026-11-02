@@ -92,11 +92,47 @@ export default function ProductForm({ categories, options, product, onClose, onS
       ...(image && { image }),
     };
 
+    const updateData: Partial<ProductMutationData> = {};
+
+    if (product) {
+      const nextName = name.trim();
+      const nextSlug = slugFromName(name);
+      const nextDescription = description.trim();
+      const nextPrice = price.trim() === '' ? null : amount;
+
+      if (nextName !== product.name) updateData.name = nextName;
+      if (nextSlug !== product.slug) updateData.slug = nextSlug;
+      if (nextDescription !== product.description) updateData.description = nextDescription;
+      if (nextPrice !== product.price) updateData.price = nextPrice;
+      if (categoryId !== product.categoryId) updateData.categoryId = categoryId;
+      if (minimum !== product.minimumStockLevel) updateData.minimumStockLevel = minimum;
+      if (maximum !== product.maximumStockLevel) updateData.maximumStockLevel = maximum;
+
+      const sizesChanged =
+        sizes.length !== product.sizes.length ||
+        sizes.some((value, index) => value !== product.sizes[index]);
+
+      const colorsChanged =
+        colors.length !== product.colors.length ||
+        colors.some((value, index) => value !== product.colors[index]);
+
+      if (sizesChanged) updateData.sizes = sizes;
+      if (colorsChanged) updateData.colors = colors;
+      if (isAvailable !== product.isAvailable) updateData.isAvailable = isAvailable;
+      if (productType !== product.productType) updateData.productType = productType;
+
+      if (imageUrl.trim() && imageUrl.trim() !== existingImageUrl) {
+        updateData.imageUrl = imageUrl.trim();
+      }
+
+      if (image) updateData.image = image;
+    }
+
     submissionInProgress.current = true;
     setIsSubmitting(true);
     try {
       const saved = product
-        ? await productService.updateProduct(product.id, data)
+        ? await productService.updateProduct(product.id, updateData)
         : await productService.createProduct(data);
       onSuccess(saved, !product);
     } catch (error) {
