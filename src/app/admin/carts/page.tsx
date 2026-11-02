@@ -8,10 +8,26 @@ import {
   FiPhone,
   FiRefreshCw,
   FiShoppingCart,
+  FiTrash2,
   FiUser,
 } from "react-icons/fi";
+import ConfirmDeleteModal from "@/app/components/admin/ConfirmDeleteModal";
 import { adminCartService } from "@/app/services/admin-cart.service";
 import type { AdminCart } from "@/app/types/admin-cart";
+
+type CartAction =
+  | {
+      type: "remove";
+      userId: string;
+      itemId: string;
+      itemName: string;
+      customerName: string;
+    }
+  | {
+      type: "clear";
+      userId: string;
+      customerName: string;
+    };
 
 function formatMoney(amount: number | null): string {
   if (amount === null) return "Price unavailable";
@@ -51,6 +67,12 @@ export default function AdminCartsPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [actionToConfirm, setActionToConfirm] = useState<CartAction | null>(
+    null,
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const loadCarts = useCallback(async (isRefresh = false) => {
     if (isRefresh) {
@@ -80,6 +102,54 @@ export default function AdminCartsPage() {
     void loadCarts();
   }, [loadCarts]);
 
+  useEffect(() => {
+    if (!successMessage) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setSuccessMessage("");
+    }, 4000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [successMessage]);
+
+  const confirmCartAction = async () => {
+    if (!actionToConfirm || isDeleting) return;
+
+    const action = actionToConfirm;
+
+    setIsDeleting(true);
+    setActionError("");
+    setSuccessMessage("");
+
+    try {
+      if (action.type === "remove") {
+        await adminCartService.removeCustomerCartItem(
+          action.userId,
+          action.itemId,
+        );
+        setSuccessMessage(
+          `${action.itemName} was removed from ${action.customerName}'s cart.`,
+        );
+      } else {
+        await adminCartService.clearCustomerCart(action.userId);
+        setSuccessMessage(
+          `${action.customerName}'s cart was cleared successfully.`,
+        );
+      }
+
+      setActionToConfirm(null);
+      await loadCarts(true);
+    } catch (err) {
+      setActionError(
+        err instanceof Error
+          ? err.message
+          : "Unable to update this customer's cart. Please try again.",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const totalCustomers = carts.length;
   const customersWithItems = carts.filter(
     (cart) => cart.items.length > 0,
@@ -90,11 +160,16 @@ export default function AdminCartsPage() {
     0,
   );
 
+  const confirmationItemName = actionToConfirm
+    ? actionToConfirm.type === "remove"
+      ? `${actionToConfirm.itemName} from ${actionToConfirm.customerName}'s cart`
+      : `all items from ${actionToConfirm.customerName}'s cart`
+    : "";
+
   return (
     <main className="space-y-6 p-4 sm:p-6 lg:p-8">
       <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          
           <h1 className="mt-1 text-2xl font-bold text-[#123B5D] sm:text-3xl">
             Cart Dashboard
           </h1>
@@ -106,7 +181,7 @@ export default function AdminCartsPage() {
         <button
           type="button"
           onClick={() => void loadCarts(true)}
-          disabled={loading || refreshing}
+          disabled={loading || refreshing || isDeleting}
           className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#123B5D] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0D2C46] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <FiRefreshCw
@@ -116,22 +191,37 @@ export default function AdminCartsPage() {
         </button>
       </section>
 
-      {error && (
+      {successMessage && (
+        <section
+          role="status"
+          className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800"
+        >
+          {successMessage}
+        </section>
+      )}
+
+      {(error || actionError) && (
         <section
           role="alert"
           className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
         >
           <FiAlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
           <div className="flex-1">
-            <p className="font-semibold">Could not load customer carts</p>
-            <p className="mt-1">{error}</p>
-            <button
-              type="button"
-              onClick={() => void loadCarts()}
-              className="mt-2 font-semibold underline"
-            >
-              Try again
-            </button>
+            <p className="font-semibold">
+              {actionError
+                ? "Could not update customer cart"
+                : "Could not load customer carts"}
+            </p>
+            <p className="mt-1">{actionError || error}</p>
+            {error && !actionError && (
+              <button
+                type="button"
+                onClick={() => void loadCarts()}
+                className="mt-2 font-semibold underline"
+              >
+                Try again
+              </button>
+            )}
           </div>
         </section>
       )}
@@ -228,6 +318,26 @@ export default function AdminCartsPage() {
                     {cart.totalQuantity} item
                     {cart.totalQuantity === 1 ? "" : "s"}
                   </p>
+
+                  {cart.items.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActionError("");
+                        setActionToConfirm({
+                          type: "clear",
+                          userId: cart.userId,
+                          customerName:
+                            cart.customer.name || cart.customer.email,
+                        });
+                      }}
+                      disabled={isDeleting}
+                      className="mt-3 inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <FiTrash2 className="h-3.5 w-3.5" />
+                      Clear cart
+                    </button>
+                  )}
                 </div>
               </header>
 
@@ -295,6 +405,26 @@ export default function AdminCartsPage() {
                           <p className="mt-1 font-bold text-[#123B5D]">
                             {formatMoney(item.lineTotal)}
                           </p>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActionError("");
+                              setActionToConfirm({
+                                type: "remove",
+                                userId: cart.userId,
+                                itemId: item.id,
+                                itemName: item.product.name,
+                                customerName:
+                                  cart.customer.name || cart.customer.email,
+                              });
+                            }}
+                            disabled={isDeleting}
+                            className="mt-2 inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <FiTrash2 className="h-3.5 w-3.5" />
+                            Remove item
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -316,6 +446,19 @@ export default function AdminCartsPage() {
             </article>
           ))}
         </section>
+      )}
+
+      {actionToConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 p-4">
+          <div className="w-full max-w-sm rounded-lg bg-white shadow-xl">
+            <ConfirmDeleteModal
+              itemName={confirmationItemName}
+              isDeleting={isDeleting}
+              onCancel={() => setActionToConfirm(null)}
+              onConfirm={() => void confirmCartAction()}
+            />
+          </div>
+        </div>
       )}
     </main>
   );

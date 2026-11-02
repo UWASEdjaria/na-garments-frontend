@@ -140,7 +140,7 @@ export default function CartPage() {
           <FiArrowLeft aria-hidden="true" /> Continue Shopping
         </Link>
 
-        <h1 className="text-2xl font-extrabold text-[#123B5D] sm:text-3xl mb-6">Your Cart</h1>
+        <h1 className="font-serif text-2xl font-extrabold text-[#123B5D] sm:text-3xl mb-6">Your Cart</h1>
 
         {isLoading ? (
           <div className="space-y-4">
@@ -151,7 +151,7 @@ export default function CartPage() {
         ) : items.length === 0 ? (
           <div className="rounded-2xl bg-white border border-gray-200 p-12 text-center shadow-sm">
             <FiShoppingBag className="mx-auto h-12 w-12 text-gray-300" />
-            <h2 className="mt-4 text-lg font-bold text-[#123B5D]">Your cart is empty</h2>
+            <h2 className="font-serif mt-4 text-lg font-bold text-[#123B5D]">Your cart is empty</h2>
             <p className="mt-2 text-sm text-gray-500">Browse our collection and add items to get started.</p>
             <Link href="/shop" className="mt-6 inline-block rounded-lg bg-[#F28C28] px-6 py-3 text-sm font-bold text-[#111111] hover:bg-[#123B5D] hover:text-white transition-colors">
               Shop Now
@@ -199,7 +199,7 @@ export default function CartPage() {
 
             {/* Order summary */}
             <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm h-fit">
-              <h2 className="text-base font-extrabold text-[#123B5D] mb-4">Order Summary</h2>
+              <h2 className="font-serif text-base font-extrabold text-[#123B5D] mb-4">Order Summary</h2>
               <div className="space-y-2 text-sm">
                 {items.map((item) => (
                   <div key={`${item.productId}-${item.size}-${item.color}`} className="flex justify-between gap-2">

@@ -279,33 +279,33 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full bg-white text-[#111111] shadow-md">
       {/* Announcement bar */}
-      <div className="flex min-h-8 items-center justify-between gap-3 bg-[#111111] px-3 py-1.5 text-xs text-[#EEF3F6] sm:px-6 lg:px-8">
-        <p className="truncate">
-          Custom Tailoring & Quality Apparel in Kigali, Rwanda
+      <div className="font-sans flex min-h-9 items-center justify-between gap-3 bg-[#111111] px-3 py-2 text-[11px] tracking-wide text-[#EEF3F6] sm:px-6 lg:px-8">
+        <p className="hidden truncate font-medium text-[#EEF3F6]/80 sm:block">
+          Custom Tailoring &amp; Quality Apparel in Kigali, Rwanda
+        </p>
+        <p className="truncate font-medium text-[#EEF3F6]/80 sm:hidden">
+          nagarments — Kigali, Rwanda
         </p>
 
         <div className="flex shrink-0 items-center gap-3 sm:gap-4">
           <CurrencySelector />
-          <div className="hidden items-center gap-4 sm:flex">
-            <div className="flex items-center gap-2 text-xs">
+          <div className="hidden items-center gap-3 sm:flex">
+            <span aria-hidden="true" className="text-gray-700">|</span>
+            <div className="flex items-center gap-3">
               {CONTACT_INFO.phoneNumbers.map((phone) => (
                 <a
                   key={phone.href}
                   href={phone.href}
-                  className="transition-colors hover:text-[#F28C28]"
+                  className="font-medium text-[#EEF3F6]/80 transition-colors hover:text-[#F28C28]"
                 >
                   {phone.display}
                 </a>
               ))}
             </div>
-
-            <span aria-hidden="true" className="text-gray-600">
-              |
-            </span>
-
+            <span aria-hidden="true" className="text-gray-700">|</span>
             <a
               href={CONTACT_INFO.emailHref}
-              className="transition-colors hover:text-[#F28C28]"
+              className="font-medium text-[#EEF3F6]/80 transition-colors hover:text-[#F28C28]"
             >
               {CONTACT_INFO.emailDisplay}
             </a>
@@ -322,16 +322,14 @@ export default function Navbar() {
           className="flex shrink-0 items-center"
           onClick={closeMobileMenu}
         >
-          <div className="relative h-11 w-32 sm:h-14 sm:w-40 lg:h-16 lg:w-48">
-            <Image
-              src="https://res.cloudinary.com/ziwgo9pj/image/upload/v1790878768/For_a_white_background.png"
-              alt="nagarments"
-              fill
-              priority
-              sizes="(max-width: 640px) 128px, (max-width: 1024px) 160px, 192px"
-              className="object-contain"
-            />
-          </div>
+          <Image
+            src="https://res.cloudinary.com/ziwgo9pj/image/upload/f_auto,q_auto,w_800/v1790878768/For_a_white_background.png"
+            alt="nagarments"
+            width={192}
+            height={64}
+            priority
+            className="h-12 w-auto object-contain sm:h-16"
+          />
         </Link>
 
         {/* Desktop navigation */}
@@ -349,7 +347,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative whitespace-nowrap py-2 text-sm font-semibold transition-colors ${
+                  className={`font-sans relative whitespace-nowrap py-2 text-sm font-semibold tracking-wide transition-colors ${
                     isActive
                       ? 'text-[#F28C28]'
                       : 'text-[#111111] hover:text-[#F28C28]'
