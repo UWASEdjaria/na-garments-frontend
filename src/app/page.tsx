@@ -20,7 +20,7 @@ export default function HomePage() {
 
       <main className="flex-grow space-y-8 pb-10 sm:space-y-10 sm:pb-12 lg:space-y-12 lg:pb-16">
         {/* 1. Hero Section */}
-        <section className="relative flex min-h-0 items-center overflow-hidden border-b-4 border-[#F28C28] bg-[#111111] px-4 py-6 text-white sm:px-6 sm:py-8 lg:min-h-[60vh] lg:px-8 lg:py-10">
+        <section className="relative flex min-h-0 items-center overflow-hidden bg-[#111111] px-4 py-6 text-white sm:px-6 sm:py-8 lg:min-h-[60vh] lg:px-8 lg:py-10">
           {/* Video Background */}
           <div className="absolute inset-0 z-0 overflow-hidden">
             <video
@@ -42,6 +42,9 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-r from-[#123B5D]/95 via-[#123B5D]/85 to-[#111111]/45 sm:from-[#123B5D]/95 sm:via-[#123B5D]/80 sm:to-[#111111]/30" />
           </div>
 
+          {/* Faded Orange Bottom Line */}
+          <div className="absolute bottom-0 left-0 right-0 z-10 h-[3px] bg-gradient-to-r from-transparent via-[#F28C28] to-transparent opacity-80" />
+
           {/* Hero Content */}
           <div className="relative z-10 mx-auto w-full max-w-7xl">
             <div className="max-w-2xl space-y-3 text-center sm:space-y-4 sm:text-left">
@@ -52,7 +55,7 @@ export default function HomePage() {
               </FadeIn>
 
               <FadeIn delay={0.1}>
-                <h1 className="break-words text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
+                <h1 className="break-words font-serif text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
                   Custom Tailoring & Quality Apparel in Kigali
                   <br className="hidden sm:inline" />{' '}
                   <span className="text-[#F28C28]">
@@ -164,7 +167,7 @@ export default function HomePage() {
                 Garment Categories
               </span>
 
-              <h2 className="break-words text-xl font-extrabold tracking-tight text-[#123B5D] sm:text-2xl md:text-3xl lg:text-4xl">
+              <h2 className="break-words font-serif text-xl font-extrabold tracking-tight text-[#123B5D] sm:text-2xl md:text-3xl lg:text-4xl">
                 Explore Our Garment Collection
               </h2>
 
@@ -177,10 +180,10 @@ export default function HomePage() {
           <FeaturedCategories />
           <div className="mt-6 text-center">
             <Link
-             href="/shop"
+              href="/shop"
               className="inline-flex min-h-[44px] items-center justify-center rounded border border-[#123B5D] px-6 py-3 text-sm font-bold text-[#123B5D] transition-colors hover:bg-[#123B5D] hover:text-white"
-               >
-                   Explore All Categories →
+            >
+              Explore All Categories →
             </Link>
           </div>
         </section>
@@ -194,7 +197,7 @@ export default function HomePage() {
                   Handcrafted Apparel
                 </span>
 
-                <h2 className="break-words text-xl font-extrabold tracking-tight text-[#123B5D] sm:text-2xl md:text-3xl lg:text-4xl">
+                <h2 className="break-words font-serif text-xl font-extrabold tracking-tight text-[#123B5D] sm:text-2xl md:text-3xl lg:text-4xl">
                   Featured Garment Designs
                 </h2>
               </div>
@@ -212,14 +215,20 @@ export default function HomePage() {
         </section>
 
         {/* 5. Custom Tailoring CTA Section */}
-        <section className="border-y-4 border-[#F28C28] bg-[#123B5D] py-8 text-white sm:py-10 lg:py-14">
+        <section className="relative bg-[#123B5D] py-8 text-white sm:py-10 lg:py-14">
+          {/* Top Faded Orange Line */}
+          <div className="absolute top-0 left-0 right-0 z-10 h-[3px] bg-gradient-to-r from-transparent via-[#F28C28] to-transparent opacity-80" />
+
+          {/* Bottom Faded Orange Line */}
+          <div className="absolute bottom-0 left-0 right-0 z-10 h-[3px] bg-gradient-to-r from-transparent via-[#F28C28] to-transparent opacity-80" />
+
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto mb-8 max-w-3xl text-center sm:mb-10">
               <span className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-[#F28C28] sm:text-xs">
                 From Choice to Fitting
               </span>
 
-              <h2 className="break-words text-xl font-extrabold tracking-tight sm:text-2xl md:text-3xl lg:text-4xl">
+              <h2 className="break-words font-serif text-xl font-extrabold tracking-tight sm:text-2xl md:text-3xl lg:text-4xl">
                 How a Custom Order Works
               </h2>
 
@@ -271,7 +280,7 @@ export default function HomePage() {
                 Uncompromised Quality
               </span>
 
-              <h2 className="break-words text-xl font-extrabold text-[#123B5D] sm:text-2xl md:text-3xl lg:text-4xl">
+              <h2 className="break-words font-serif text-xl font-extrabold text-[#123B5D] sm:text-2xl md:text-3xl lg:text-4xl">
                 What You Can Expect From Us
               </h2>
 
@@ -312,7 +321,7 @@ export default function HomePage() {
                 About nagarments
               </span>
 
-              <h2 className="break-words text-xl font-extrabold text-[#123B5D] sm:text-2xl lg:text-3xl">
+              <h2 className="break-words font-serif text-xl font-extrabold text-[#123B5D] sm:text-2xl lg:text-3xl">
                 Clothing Made in Kigali, Serving Beyond Rwanda
               </h2>
 
@@ -362,7 +371,7 @@ export default function HomePage() {
         {/* 8. Contact CTA Banner */}
         <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="space-y-4 rounded-lg border-2 border-[#F28C28] bg-[#111111] p-4 text-center text-white sm:space-y-6 sm:p-8 lg:p-12">
-            <h2 className="break-words text-xl font-extrabold tracking-tight sm:text-2xl md:text-3xl lg:text-4xl">
+            <h2 className="break-words font-serif text-xl font-extrabold tracking-tight sm:text-2xl md:text-3xl lg:text-4xl">
               Let&apos;s Talk About Your Order
             </h2>
 

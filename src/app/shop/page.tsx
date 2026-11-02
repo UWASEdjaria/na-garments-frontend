@@ -82,7 +82,7 @@ function ShopContent() {
     }
   }, [searchParams]);
 
-   useEffect(() => {
+  useEffect(() => {
     void loadData();
 
     const handleVisibilityChange = () => {
@@ -99,7 +99,6 @@ function ShopContent() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [loadData]);
-
 
   useEffect(() => {
     const categorySlug = searchParams.get('category');
@@ -134,7 +133,6 @@ function ShopContent() {
     loadWishlist();
   }, []);
 
-  // Reset to page 1 whenever filters or search change.
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, sortBy]);
@@ -194,6 +192,7 @@ function ShopContent() {
 
     return list;
   }, [products, searchQuery, selectedCategory, sortBy]);
+
   const hasPricedProducts = filteredProducts.some(
     (product: Product) =>
       product.price != null &&
@@ -210,7 +209,6 @@ function ShopContent() {
     }
   }, [hasPricedProducts, sortBy]);
 
-  // Pagination calculation.
   const totalPages = Math.ceil(
     filteredProducts.length / ITEMS_PER_PAGE,
   );
@@ -278,23 +276,20 @@ function ShopContent() {
       showToast({
         type: 'info',
         title: 'Login required',
-        description: 'Please log in or create an account to add products to your wishlist. Your favorite products will be easier to find when you return.',
+        description: 'Please log in or create an account to add products to your wishlist.',
       });
       return;
     }
 
     const isWishlisted = wishlistProductIds.includes(productId);
-
     setWishlistLoadingId(productId);
 
     try {
       if (isWishlisted) {
         await wishlistService.removeItem(productId);
-
         setWishlistProductIds((current) =>
           current.filter((id) => id !== productId),
         );
-
         showToast({
           type: 'success',
           title: 'Removed from wishlist',
@@ -302,12 +297,7 @@ function ShopContent() {
         });
       } else {
         await wishlistService.addItem(productId);
-
-        setWishlistProductIds((current) => [
-          ...current,
-          productId,
-        ]);
-
+        setWishlistProductIds((current) => [...current, productId]);
         showToast({
           type: 'success',
           title: 'Added to wishlist',
@@ -331,7 +321,7 @@ function ShopContent() {
 
       <main className="flex-grow w-full min-w-0 pb-8 sm:pb-12">
         {/* Compact Banner */}
-        <section className="bg-[#123B5D] text-white py-4 sm:py-6 px-3 sm:px-5 lg:px-7 border-b-2 border-[#F28C28] shadow-sm">
+        <section className="bg-[#123B5D] text-white py-4 sm:py-6 px-3 sm:px-5 lg:px-7 shadow-sm">
           <div className="max-w-7xl w-full min-w-0 mx-auto text-center space-y-1.5">
             <FadeIn>
               <span className="inline-block max-w-full break-words text-[10px] sm:text-xs font-bold text-[#F28C28] uppercase tracking-widest bg-[#123B5D]/60 px-2.5 py-1 rounded-full border border-[#F28C28]/30">
@@ -340,7 +330,7 @@ function ShopContent() {
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight break-words">
+              <h1 className="font-serif text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight break-words">
                 Explore Our Designs &amp; Collection
               </h1>
             </FadeIn>
@@ -390,7 +380,7 @@ function ShopContent() {
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-gray-400 hover:text-[#111111] font-bold"
                       aria-label="Clear search"
                     >
-                      Ã—
+                      ✕
                     </button>
                   )}
                 </div>
@@ -465,16 +455,15 @@ function ShopContent() {
                 Loading garments...
               </p>
 
-              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
                 {Array.from({ length: 8 }).map((_, index: number) => (
                   <div
                     key={index}
-                    className="bg-white rounded-xl border border-gray-200/80 p-2.5 animate-pulse space-y-3 min-w-0"
+                    className="bg-white rounded-xl border border-gray-200/80 p-3 animate-pulse space-y-3 min-w-0"
                   >
-                    <div className="aspect-[4/3] bg-gray-200 rounded-lg w-full" />
+                    <div className="aspect-[4/5] bg-gray-200 rounded-lg w-full" />
                     <div className="h-3 bg-gray-200 rounded w-3/4" />
                     <div className="h-2.5 bg-gray-200 rounded w-1/2" />
-                    <div className="h-8 bg-gray-200 rounded-lg w-full" />
                   </div>
                 ))}
               </div>
@@ -509,7 +498,7 @@ function ShopContent() {
           {!isLoading && !error && filteredProducts.length === 0 && (
             <div className="bg-white border border-gray-200/80 p-5 sm:p-8 rounded-xl text-center max-w-md w-full min-w-0 mx-auto space-y-3 shadow-sm my-4">
               <div className="w-10 h-10 rounded-full bg-[#EEF3F6] text-[#123B5D] flex items-center justify-center mx-auto text-lg font-bold">
-                ðŸ”
+                🔍
               </div>
 
               <h3 className="font-bold text-sm sm:text-base text-[#123B5D] break-words">
@@ -530,11 +519,11 @@ function ShopContent() {
             </div>
           )}
 
-          {/* Product Cards */}
+          {/* Clean White Background Cards with Text Below */}
           {!isLoading && !error && filteredProducts.length > 0 && (
             <>
               <SlideUp>
-                <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+                <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
                   {paginatedProducts.map((product: Product) => {
                     const imageUrl =
                       productService.getPrimaryImageUrl(product);
@@ -542,146 +531,130 @@ function ShopContent() {
                     const isOutOfStock =
                       !product.isAvailable || product.stockQuantity <= 0;
 
+                    const isWishlisted = wishlistProductIds.includes(product.id);
+
                     return (
                       <div
                         key={product.id}
-                        className="bg-white rounded-xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-md hover:border-[#123B5D]/25 hover:-translate-y-0.5 transition-all duration-300 flex flex-col group min-w-0"
-                      >                        {/* Product Type Badge and Wishlist */}
-                        <div className="h-10 px-2.5 flex items-center justify-between gap-2">
-                          {product.productType === 'MADE_TO_ORDER' ? (
-                            <span className="inline-flex rounded-full bg-[#FFF0DF] px-2 py-0.5 text-[9px] font-semibold tracking-wide text-[#9A4D00]">
-                              Made to Order
-                            </span>
-                          ) : (
-                            <span className="inline-flex rounded-full bg-[#DBEAFE] px-2 py-0.5 text-[9px] font-semibold tracking-wide text-[#123B5D]">
-                              Ready to Wear
-                            </span>
-                          )}
+                        className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300"
+                      >
+                        {/* Top Image Frame with White Background & Wishlist Heart */}
+                        <div className="relative aspect-[4/5] w-full bg-white overflow-hidden flex items-center justify-center">
+                          <Image
+                            src={imageUrl}
+                            alt={product.name}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                            unoptimized
+                          />
+
+                          {/* Top Badges */}
+                          <div className="absolute top-2.5 left-2.5 z-10">
+                            {product.productType === 'MADE_TO_ORDER' ? (
+                              <span className="inline-flex rounded-full bg-[#FFF0DF]/90 backdrop-blur-sm px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase text-[#9A4D00] shadow-sm">
+                                Made to Order
+                              </span>
+                            ) : (
+                              <span className="inline-flex rounded-full bg-[#DBEAFE]/90 backdrop-blur-sm px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase text-[#123B5D] shadow-sm">
+                                Ready to Wear
+                              </span>
+                            )}
+                          </div>
 
                           <button
                             type="button"
                             onClick={() => handleWishlistToggle(product.id)}
                             disabled={wishlistLoadingId === product.id}
                             aria-label={
-                              wishlistProductIds.includes(product.id)
+                              isWishlisted
                                 ? 'Remove from wishlist'
                                 : 'Add to wishlist'
                             }
-                            className={`w-7 h-7 shrink-0 rounded-full flex items-center justify-center ring-1 ring-black/5 transition-all duration-200 hover:bg-[#123B5D] hover:text-white disabled:opacity-50 ${
-                              wishlistProductIds.includes(product.id)
+                            className={`absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full flex items-center justify-center shadow-sm transition-all duration-200 hover:scale-110 disabled:opacity-50 ${
+                              isWishlisted
                                 ? 'bg-[#123B5D] text-white'
-                                : 'bg-white text-[#123B5D]'
+                                : 'bg-white/90 backdrop-blur-sm text-[#123B5D] hover:bg-[#123B5D] hover:text-white'
                             }`}
                           >
-                            <FiHeart className="w-4 h-4" />
+                            <FiHeart className="w-3.5 h-3.5" />
                           </button>
                         </div>
-{/* Product Image */}
-                        <div className="relative aspect-[4/3] w-full bg-[#F8FAFC] p-1.5 overflow-hidden flex items-center justify-center border-b border-gray-100">
-                          {imageUrl &&
-                          imageUrl !== '/images/placeholder-garment.jpg' ? (
-                            <Image
-                              src={imageUrl}
-                              alt={product.name}
-                              fill
-                              unoptimized
-                              className="object-contain sm:group-hover:scale-105 sm:transition-transform sm:duration-300 p-2"
-                            />
-                          ) : (
-                            <div className="flex flex-col items-center justify-center text-gray-400 p-3 text-center">
-                              <svg
-                                className="w-8 h-8 mb-1 opacity-40"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="1.5"
-                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6"
-                                />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
 
-                        {/* Compact Card Content */}
-                        <div className="p-2.5 flex flex-1 flex-col justify-between gap-1.5 min-w-0">
-                          <div className="space-y-1 min-w-0">
+                        {/* Card Content Below Image */}
+                        <div className="p-3.5 flex flex-1 flex-col justify-between bg-white border-t border-gray-100">
+                          <div className="space-y-1">
                             {product.category?.name && (
-                              <span className="text-[9px] font-bold text-[#123B5D]/75 uppercase tracking-[0.1em] block [overflow-wrap:anywhere]">
+                              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em] block">
                                 {product.category.name}
                               </span>
                             )}
 
-                            <h2 className="font-semibold text-sm sm:text-base text-[#111111] leading-snug line-clamp-1 [overflow-wrap:anywhere] group-hover:text-[#123B5D] transition-colors duration-200">
+                            <h2 className="font-serif text-sm sm:text-base font-bold text-[#111111] leading-snug line-clamp-1 group-hover:text-[#123B5D] transition-colors">
                               {product.name}
                             </h2>
 
-                            <p className="text-xs text-gray-500 line-clamp-2 leading-snug min-h-[2rem] [overflow-wrap:anywhere]">
+                            <p className="text-[11px] text-gray-500 line-clamp-1">
                               {product.description ||
-                                'Custom tailored garment crafted with premium materials.'}
+                                'Custom tailored garment crafted with precision.'}
                             </p>
                           </div>
 
                           {/* Pricing & Actions */}
-                          <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                          <div className="mt-3 pt-2.5 border-t border-gray-100 space-y-2">
                             {product.productType === 'MADE_TO_ORDER' ? (
                               <>
-                                <p className="text-xs text-gray-500 leading-snug">
-                                  Price depends on your requirements.
-                                </p>
-
+                                <p className="text-[10px] text-gray-400 italic">Price on request</p>
                                 <div className="grid grid-cols-2 gap-1.5">
                                   <Link
                                     href={`/shop/${product.id}`}
-                                    className="w-full min-w-0 whitespace-nowrap bg-[#EEF3F6] text-[#123B5D] hover:bg-[#123B5D] hover:text-white font-semibold text-[11px] sm:text-xs leading-tight px-1 py-1 rounded-lg text-center transition-all duration-200 flex items-center justify-center min-h-[40px]"
+                                    className="flex min-h-[32px] items-center justify-center rounded-lg bg-[#EEF3F6] px-1 text-center text-[11px] font-bold text-[#123B5D] transition-all hover:bg-[#123B5D] hover:text-white"
                                   >
-                                    View Details
+                                    Details
                                   </Link>
-
                                   <Link
                                     href={`/custom-order?productId=${product.id}&garmentType=${encodeURIComponent(product.name)}`}
-                                    className="w-full min-w-0 whitespace-nowrap bg-[#F28C28] text-[#111111] hover:bg-[#123B5D] hover:text-white font-semibold text-[11px] sm:text-xs leading-tight px-1 py-1 rounded-lg text-center transition-all duration-200 flex items-center justify-center min-h-[40px]"
+                                    className="flex min-h-[32px] items-center justify-center rounded-lg bg-[#F28C28] px-1 text-center text-[11px] font-bold text-[#111111] transition-all hover:bg-[#123B5D] hover:text-white"
                                   >
-                                    Request a Quote
+                                    Request Quote
                                   </Link>
                                 </div>
                               </>
                             ) : (
                               <>
-                                <div className="flex flex-col min-[380px]:flex-row min-[380px]:items-baseline justify-between gap-1 min-w-0">
-                                  <span className="font-black text-sm text-[#123B5D] tracking-tight [overflow-wrap:anywhere]">
+                                <div className="flex items-baseline justify-between">
+                                  <span className="font-black text-sm sm:text-base text-[#111111] tracking-tight">
                                     {format(Number(product.price))}
                                   </span>
+                                  {isOutOfStock && (
+                                    <span className="text-[9px] font-bold text-red-600 uppercase">Sold Out</span>
+                                  )}
                                 </div>
 
-                                                                {isOutOfStock && (
-                                  <p className="mb-2 text-xs font-medium text-red-600">
-                                    This item is currently unavailable. Please check back soon.
-                                  </p>
-                                )}
-<div className="grid grid-cols-2 gap-1.5">
+                                <div className="grid grid-cols-2 gap-1.5">
                                   <Link
                                     href={`/shop/${product.id}`}
-                                    className="w-full min-w-0 whitespace-nowrap bg-[#EEF3F6] text-[#123B5D] hover:bg-[#123B5D] hover:text-white font-semibold text-[11px] sm:text-xs leading-tight px-1 py-1 rounded-lg text-center transition-all duration-200 flex items-center justify-center min-h-[40px]"
+                                    className="flex min-h-[32px] items-center justify-center rounded-lg bg-[#EEF3F6] px-1 text-center text-[11px] font-bold text-[#123B5D] transition-all hover:bg-[#123B5D] hover:text-white"
                                   >
-                                    View Details
+                                    Details
                                   </Link>
 
                                   <button
                                     onClick={() => handleAddToCart(product)}
                                     disabled={isOutOfStock}
-                                    className={`w-full min-w-0 whitespace-nowrap font-semibold text-[11px] sm:text-xs leading-tight px-1 py-1 rounded-lg transition-all duration-200 flex items-center justify-center min-h-[40px] ${
+                                    className={`flex min-h-[32px] items-center justify-center rounded-lg px-1 text-center text-[11px] font-bold transition-all ${
                                       isOutOfStock
-                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                         : addedProductId === product.id
-                                          ? 'bg-green-600 text-white'
-                                          : 'bg-[#F28C28] text-[#111111] hover:bg-[#123B5D] hover:text-white shadow-sm'
+                                        ? 'bg-green-600 text-white'
+                                        : 'bg-[#F28C28] text-[#111111] hover:bg-[#123B5D] hover:text-white shadow-sm'
                                     }`}
                                   >
-                                    {isOutOfStock ? 'Out of Stock' : addedProductId === product.id ? 'View Cart' : 'Add to Cart'}
+                                    {isOutOfStock
+                                      ? 'Sold Out'
+                                      : addedProductId === product.id
+                                      ? 'Cart'
+                                      : 'Add to Cart'}
                                   </button>
                                 </div>
                               </>
@@ -697,8 +670,8 @@ function ShopContent() {
               {/* Pagination */}
               {totalPages > 1 && (
                 <FadeIn delay={0.15}>
-                  <div className="mt-4 sm:mt-5 bg-white rounded-xl border border-gray-200/80 p-2.5 sm:p-3 flex flex-col lg:flex-row items-center justify-between gap-2.5 shadow-sm min-w-0">
-                    <div className="text-[11px] text-gray-500 font-medium text-center lg:text-left break-words">
+                  <div className="mt-6 bg-white rounded-xl border border-gray-200/80 p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
+                    <div className="text-xs text-gray-500 font-medium">
                       Showing{' '}
                       <span className="font-extrabold text-[#123B5D]">
                         {(currentPage - 1) * ITEMS_PER_PAGE + 1}
@@ -717,18 +690,18 @@ function ShopContent() {
                       garments
                     </div>
 
-                    <div className="flex items-center justify-center gap-1.5 flex-wrap max-w-full min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                        className={`px-3 py-2 rounded-xl text-xs font-bold transition-all ${
                           currentPage === 1
                             ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
                             : 'bg-[#EEF3F6] text-[#123B5D] hover:bg-[#123B5D] hover:text-white'
                         }`}
-                        aria-label="Previous Page"
                       >
-                        Previous</button>
+                        Previous
+                      </button>
 
                       {Array.from({ length: totalPages }).map(
                         (_, index: number) => {
@@ -739,7 +712,7 @@ function ShopContent() {
                             <button
                               key={pageNum}
                               onClick={() => handlePageChange(pageNum)}
-                              className={`w-8 h-8 shrink-0 text-xs font-extrabold rounded-lg transition-all flex items-center justify-center ${
+                              className={`w-9 h-9 text-xs font-extrabold rounded-xl transition-all flex items-center justify-center ${
                                 isActive
                                   ? 'bg-[#123B5D] text-white shadow-sm'
                                   : 'bg-[#EEF3F6] text-[#123B5D] hover:bg-[#123B5D] hover:text-white'
@@ -754,14 +727,14 @@ function ShopContent() {
                       <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                        className={`px-3 py-2 rounded-xl text-xs font-bold transition-all ${
                           currentPage === totalPages
                             ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
                             : 'bg-[#EEF3F6] text-[#123B5D] hover:bg-[#123B5D] hover:text-white'
                         }`}
-                        aria-label="Next Page"
                       >
-                        Next</button>
+                        Next
+                      </button>
                     </div>
                   </div>
                 </FadeIn>
@@ -780,11 +753,8 @@ export default function ShopPage() {
   return (
     <Suspense
       fallback={
-        <div
-          role="status"
-          className="min-h-screen flex items-center justify-center bg-[#EEF3F6] text-[#64748B] text-sm font-medium"
-        >
-          Loading shop...
+        <div className="min-h-screen flex items-center justify-center bg-[#EEF3F6] text-[#123B5D]">
+          <p className="text-sm font-bold">Loading shop collection...</p>
         </div>
       }
     >
@@ -792,4 +762,3 @@ export default function ShopPage() {
     </Suspense>
   );
 }
-

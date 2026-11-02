@@ -51,7 +51,7 @@ export default function ContactPage() {
                   <p className="mb-2 text-xs font-bold tracking-[0.25em] text-[#F28C28]">
                     nagarments
                   </p>
-                  <h2 className="text-2xl font-extrabold leading-tight sm:text-3xl lg:text-4xl">
+                  <h2 className="font-serif text-2xl font-extrabold leading-tight sm:text-3xl lg:text-4xl">
                     Made in Kigali. Made for You.
                   </h2>
                   <p className="mt-2 max-w-md text-sm leading-relaxed text-[#EEF3F6]/90 sm:text-base">
