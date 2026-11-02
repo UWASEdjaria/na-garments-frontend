@@ -11,6 +11,7 @@ import {
   FiShoppingBag,
   FiCheck,
   FiTag,
+  FiShare2,
 } from 'react-icons/fi';
 
 import Navbar from '@/app/components/Navbar';
@@ -38,8 +39,7 @@ export default function ProductDetailsPage() {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
 
-
-    useEffect(() => {
+  useEffect(() => {
     let isCurrentRequest = true;
     let isInitialLoad = true;
 
@@ -97,7 +97,6 @@ export default function ProductDetailsPage() {
     };
   }, [productId, retryCount]);
 
-
   const handleRetry = () => {
     setProduct(null);
     setError(null);
@@ -147,15 +146,13 @@ export default function ProductDetailsPage() {
 
   if (isLoading) {
     return pageFrame(
-      <div className="grid animate-pulse grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
-        <div className="aspect-[4/5] rounded-2xl bg-gray-200" />
-        <div className="space-y-5 py-4">
+      <div className="grid animate-pulse grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12 items-start">
+        <div className="h-[500px] lg:col-span-6 rounded-2xl bg-gray-200" />
+        <div className="space-y-5 py-4 lg:col-span-6">
           <div className="h-4 w-28 rounded bg-gray-200" />
           <div className="h-12 w-3/4 rounded bg-gray-200" />
           <div className="h-8 w-36 rounded bg-gray-200" />
           <div className="h-5 w-40 rounded bg-gray-200" />
-          <div className="h-24 w-full rounded bg-gray-200" />
-          <div className="h-12 w-full rounded bg-gray-200" />
         </div>
       </div>
     );
@@ -164,7 +161,7 @@ export default function ProductDetailsPage() {
   if (error || !product) {
     return pageFrame(
       <div className="mx-auto max-w-lg py-16 text-center">
-        <h1 className="text-2xl font-bold text-[#123B5D]">Product unavailable</h1>
+        <h1 className="font-serif text-2xl font-bold text-[#123B5D]">Product unavailable</h1>
         <p className="mt-3 text-sm leading-6 text-gray-600">
           {error ?? 'We could not find this product.'}
         </p>
@@ -208,12 +205,12 @@ export default function ProductDetailsPage() {
 
       {/* Main product section */}
       <SlideUp delay={0.1}>
-        <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="grid grid-cols-1 lg:grid-cols-2">
+        <section className="w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 lg:gap-12 items-start">
 
-            {/* Images */}
-            <div className="bg-[#F8FAFC] p-4 sm:p-6 lg:p-8">
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-white">
+            {/* Images (Left Column) */}
+            <div className="lg:col-span-6 space-y-4">
+              <div className="relative w-full overflow-hidden rounded-2xl flex items-center justify-center min-h-[480px] lg:min-h-[580px]">
                 <Image
                   src={activeImage}
                   alt={product.name}
@@ -221,12 +218,12 @@ export default function ProductDetailsPage() {
                   priority
                   unoptimized
                   sizes="(max-width: 1023px) 100vw, 50vw"
-                  className="object-contain p-5 sm:p-8"
+                  className="object-contain object-center"
                 />
               </div>
 
               {images.length > 1 && (
-                <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
+                <div className="flex gap-3 overflow-x-auto pb-1">
                   {images.map((image, index) => (
                     <button
                       key={image.id}
@@ -234,30 +231,48 @@ export default function ProductDetailsPage() {
                       onClick={() => setSelectedImageIndex(index)}
                       aria-label={`Show product image ${index + 1}`}
                       aria-pressed={selectedImageIndex === index}
-                      className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border bg-white transition-all ${
+                      className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border bg-white transition-all ${
                         selectedImageIndex === index
                           ? 'border-[#F28C28] ring-2 ring-[#F28C28]'
                           : 'border-gray-200 hover:border-[#123B5D]'
                       }`}
                     >
-                      <Image src={image.url} alt="" fill unoptimized className="object-contain p-2" />
+                      <Image src={image.url} alt="" fill unoptimized className="object-contain p-1" />
                     </button>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Info */}
-            <div className="flex flex-col p-6 sm:p-8 lg:p-10">
+            {/* Info (Right Column) */}
+            <div className="flex flex-col lg:col-span-6 pt-4 lg:pt-0 lg:pl-4">
               {product.category?.name && (
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#123B5D]">
                   {product.category.name}
                 </p>
               )}
 
-              <h1 className="mt-3 break-words text-3xl font-black leading-tight text-[#111111] sm:text-4xl">
-                {product.name}
-              </h1>
+              <div className="mt-3 flex items-start justify-between gap-4">
+                <h1 className="font-serif break-words text-3xl font-black leading-tight text-[#111111] sm:text-4xl">
+                  {product.name}
+                </h1>
+                
+                <button
+                  type="button"
+                  aria-label="Share product"
+                  onClick={() => {
+                    if (navigator.share) {
+                      void navigator.share({ title: product.name, url: window.location.href });
+                    } else {
+                      void navigator.clipboard.writeText(window.location.href);
+                      showToast({ type: 'info', title: 'Link copied', description: 'Product link copied to clipboard.' });
+                    }
+                  }}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-gray-600 shadow-sm transition-hover hover:bg-[#123B5D] hover:text-white"
+                >
+                  <FiShare2 className="h-4 w-4" />
+                </button>
+              </div>
 
               {isMadeToOrder ? (
                 <>
@@ -290,13 +305,13 @@ export default function ProductDetailsPage() {
                 </p>
               </div>
 
-              {/* Availability â€” ready-to-wear only */}
+              {/* Availability — ready-to-wear only */}
               {!isMadeToOrder && (
-                <div className="mt-7 rounded-xl bg-[#EEF3F6] p-4">
+                <div className="mt-7 rounded-xl bg-white p-4 shadow-2xs">
                   <div className="flex items-center gap-3">
                     <div
                       className={`flex h-9 w-9 items-center justify-center rounded-full ${
-                        isInStock ? 'bg-white text-green-600' : 'bg-white text-red-500'
+                        isInStock ? 'bg-[#EEF3F6] text-green-600' : 'bg-[#EEF3F6] text-red-500'
                       }`}
                     >
                       <FiCheck aria-hidden="true" />
@@ -311,7 +326,7 @@ export default function ProductDetailsPage() {
                 </div>
               )}
 
-              {/* Quantity + cart â€” ready-to-wear only */}
+              {/* Quantity + cart — ready-to-wear only */}
               {!isMadeToOrder && (
                 <div className="mt-7">
                   <p className="mb-2 text-sm font-bold text-[#111111]">Quantity</p>
@@ -350,7 +365,6 @@ export default function ProductDetailsPage() {
                       {isAddingToCart ? 'Adding...' : !isInStock ? 'Out of Stock' : isAddedToCart ? 'View Cart' : 'Add to Cart'}
                     </button>
                   </div>
-
                 </div>
               )}
 
@@ -373,28 +387,28 @@ export default function ProductDetailsPage() {
         </section>
       </SlideUp>
 
-      {/* Product info panel */}
+      {/* Product info panel (Borderless) */}
       <SlideUp delay={0.2}>
-        <section className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+        <section className="mt-10 pt-8 border-t border-gray-200">
           <div className="max-w-3xl">
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#123B5D]">
               Product Information
             </p>
-            <h2 className="mt-2 text-2xl font-black text-[#111111]">About this product</h2>
+            <h2 className="font-serif mt-2 text-2xl font-black text-[#111111]">About this product</h2>
             <p className="mt-3 text-sm leading-7 text-gray-600">
               {product.description ||
                 'This garment is carefully made with attention to quality, comfort, and finishing.'}
             </p>
 
             <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="rounded-xl bg-[#EEF3F6] p-4">
+              <div className="rounded-xl bg-white p-4 shadow-2xs">
                 <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Category</p>
                 <p className="mt-1 text-sm font-bold text-[#123B5D]">
                   {product.category?.name || 'Garment'}
                 </p>
               </div>
 
-              <div className="rounded-xl bg-[#EEF3F6] p-4">
+              <div className="rounded-xl bg-white p-4 shadow-2xs">
                 <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Type</p>
                 <p className="mt-1 text-sm font-bold text-[#123B5D]">
                   {isMadeToOrder ? 'Made to Order' : 'Ready to Wear'}
@@ -402,7 +416,7 @@ export default function ProductDetailsPage() {
               </div>
 
               {!isMadeToOrder && (
-                <div className="rounded-xl bg-[#EEF3F6] p-4">
+                <div className="rounded-xl bg-white p-4 shadow-2xs">
                   <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Availability</p>
                   <p className="mt-1 text-sm font-bold text-[#123B5D]">
                     {isInStock ? 'Available' : 'Out of stock'}
@@ -416,4 +430,3 @@ export default function ProductDetailsPage() {
     </>
   );
 }
-

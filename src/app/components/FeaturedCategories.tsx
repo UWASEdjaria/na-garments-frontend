@@ -5,57 +5,99 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Category } from '@/app/types';
 import { productService } from '@/app/services/product.service';
+import { FiArrowUpRight } from 'react-icons/fi';
 
 export default function FeaturedCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
 
   useEffect(() => {
     async function loadCategories() {
-      const fetchedCategories = await productService.getCategories();
-      setCategories(fetchedCategories);
+      try {
+        const fetchedCategories = await productService.getCategories();
+        setCategories(fetchedCategories);
+      } catch (err) {
+        console.error('Failed to load categories:', err);
+      }
     }
 
     loadCategories();
   }, []);
 
+  if (categories.length === 0) return null;
+
+  const displayCategories = categories.slice(0, 4);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 auto-rows-fr">
-      {categories.map((category) => (
-        <Link
-          key={category.id}
-          href={`/shop?category=${category.slug}`}
-          aria-label={`Browse ${category.name} designs`}
-          className="group flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#123B5D]"
-        >
-          <div className="relative aspect-square w-full shrink-0 overflow-hidden bg-[#F8FAFC] p-4">
-            <Image
-              src={category.imageUrl || '/images/placeholder-garment.jpg'}
-              alt={category.name}
-              fill
-              sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
-              className="object-contain p-3 transition-transform duration-300 group-hover:scale-105"
-              unoptimized
-            />
-          </div>
+    <div className="w-full">
+      {/* Responsive layout: Clean grid of portrait cards on mobile/tablet, expanding horizontal accordion on desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-row lg:h-[520px] gap-6 lg:gap-4 transition-all duration-500 ease-in-out">
+        {displayCategories.map((category, index) => {
+          const isActive = activeIndex === index;
+          const imageUrl = category.imageUrl || '/images/placeholder-garment.jpg';
 
-          <div className="flex flex-1 flex-col p-5 sm:p-6">
-            <h3 className="mb-3 text-xl font-bold text-[#123B5D] transition-colors duration-200 group-hover:text-[#F28C28]">
-              {category.name}
-            </h3>
+          return (
+            <Link
+              key={category.id}
+              href={`/shop?category=${category.slug}`}
+              onMouseEnter={() => setActiveIndex(index)}
+              onFocus={() => setActiveIndex(index)}
+              aria-label={`Browse ${category.name}`}
+              className={`group relative flex flex-col justify-end overflow-hidden rounded-3xl transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+                isActive ? 'lg:flex-[3]' : 'lg:flex-[1] opacity-90 hover:opacity-100'
+              } h-[420px] lg:h-full bg-neutral-900 shadow-lg`}
+            >
+              {/* Original Image as Full Card Background (object-cover) */}
+              <div className="absolute inset-0">
+                <Image
+                  src={imageUrl}
+                  alt={category.name}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 33vw"
+                  className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                  unoptimized
+                />
+              </div>
 
-            <p className="line-clamp-3 min-h-[4.5rem] flex-1 text-sm leading-relaxed text-gray-600">
-              {category.description || 'Explore garment designs in this category.'}
-            </p>
+              {/* Gradient Overlay for Text Legibility at the Bottom */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-90" />
 
-            <div className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#EEF3F6] px-4 py-3 text-xs font-bold uppercase tracking-wider text-[#123B5D] transition-colors duration-200 group-hover:bg-[#123B5D] group-hover:text-white">
-              Browse Designs
-              <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
-                â†’
-              </span>
-            </div>
-          </div>
-        </Link>
-      ))}
+              {/* Number Tag */}
+              <div className="absolute top-4 left-4 z-10">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-xs font-bold text-white border border-white/20">
+                  0{index + 1}
+                </span>
+              </div>
+
+              {/* Floating Arrow Icon (Desktop hover) */}
+              <div
+                className={`absolute inset-0 flex items-center justify-center z-10 pointer-events-none transition-all duration-500 ${
+                  isActive ? 'lg:opacity-100 lg:scale-100' : 'lg:opacity-0 lg:scale-75'
+                }`}
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30 shadow-lg transition-transform duration-300 group-hover:scale-110">
+                  <FiArrowUpRight className="h-6 w-6" />
+                </div>
+              </div>
+
+              {/* Text Content */}
+              <div className="relative z-10 p-6 text-white space-y-1.5">
+                <span className="block text-[10px] font-bold uppercase tracking-widest text-[#F28C28]">
+                  Featured Category
+                </span>
+
+                <h3 className="font-serif font-bold text-white text-xl sm:text-2xl">
+                  {category.name}
+                </h3>
+
+                <p className="text-xs sm:text-sm leading-relaxed text-gray-200 line-clamp-2">
+                  {category.description || 'Explore custom garment designs handcrafted with quality fabrics.'}
+                </p>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

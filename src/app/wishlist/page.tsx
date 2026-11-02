@@ -65,7 +65,7 @@ export default function WishlistPage() {
           <FiArrowLeft aria-hidden="true" /> Back to Shop
         </Link>
 
-        <h1 className="text-2xl font-extrabold text-[#123B5D] sm:text-3xl mb-6">My Wishlist</h1>
+        <h1 className="font-serif text-2xl font-extrabold text-[#123B5D] sm:text-3xl mb-6">My Wishlist</h1>
 
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -76,7 +76,7 @@ export default function WishlistPage() {
         ) : entries.length === 0 ? (
           <div className="rounded-2xl bg-white border border-gray-200 p-12 text-center shadow-sm">
             <FiHeart className="mx-auto h-12 w-12 text-gray-300" />
-            <h2 className="mt-4 text-lg font-bold text-[#123B5D]">Your wishlist is empty</h2>
+            <h2 className="font-serif mt-4 text-lg font-bold text-[#123B5D]">Your wishlist is empty</h2>
             <p className="mt-2 text-sm text-gray-500">Save items you love and come back to them later.</p>
             <Link href="/shop" className="mt-6 inline-block rounded-lg bg-[#F28C28] px-6 py-3 text-sm font-bold text-[#111111] hover:bg-[#123B5D] hover:text-white transition-colors">
               Browse Collection

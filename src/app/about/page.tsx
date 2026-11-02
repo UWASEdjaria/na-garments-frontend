@@ -75,7 +75,7 @@ export default function AboutPage() {
 
         {/* 1. HERO SECTION: Clean Heading & Paragraph */}
         <section className="py-4 space-y-4 max-w-3xl">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#123B5D] tracking-tight leading-[1.15]">
+          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#123B5D] tracking-tight leading-[1.15]">
             Custom Tailored Apparel, <br />
             <span className="text-[#F28C28]">Crafted in Kigali.</span>
           </h1>
@@ -133,7 +133,7 @@ export default function AboutPage() {
               <span className="text-xs font-bold text-[#F28C28] uppercase tracking-wider">
                 {activeTab.toUpperCase()}
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#123B5D]">
+              <h2 className="font-serif text-2xl sm:text-3xl font-extrabold text-[#123B5D]">
                 {tabContent[activeTab].title}
               </h2>
               <p className="text-xs sm:text-sm font-medium text-gray-500">
@@ -159,7 +159,7 @@ export default function AboutPage() {
               <span className="text-xs font-bold uppercase tracking-widest text-[#F28C28]">
                 Production Range
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#123B5D] mt-1">
+              <h2 className="font-serif text-2xl sm:text-3xl font-extrabold text-[#123B5D] mt-1">
                 What We Make to Order
               </h2>
             </div>
@@ -211,7 +211,7 @@ export default function AboutPage() {
               <span className="text-xs font-bold uppercase tracking-widest text-[#F28C28]">
                 Visit Our Workshop
               </span>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-[#123B5D]">Find Us in Kigali</h2>
+              <h2 className="font-serif text-xl sm:text-2xl font-extrabold text-[#123B5D]">Find Us in Kigali</h2>
               <p className="text-sm text-gray-600 leading-relaxed">
                 {CONTACT_INFO.locationDisplay || 'Located near Batsinda Bus Park in Kagugu, Kigali.'}
               </p>
